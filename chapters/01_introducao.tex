@@ -1,0 +1,12 @@
+\section{Introdução}
+
+Este trabalho apresenta o desenvolvimento de um cronômetro digital completo no formato HH:MM:SS, operando com lógica de contagem crescente e decrescente. O projeto fundamenta-se na utilização exclusiva de lógica digital básica no ambiente Logisim Evolution, respeitando a restrição rigorosa de não utilizar circuitos integrados prontos.
+
+Esta abordagem visa consolidar o entendimento profundo de blocos fundamentais, como portas lógicas, somadores de 4 bits e unidades de armazenamento de estado. A arquitetura do sistema é estritamente modular, seguindo um fluxo de processamento que parte da geração de um sinal de clock periódico, passa por uma unidade de controle e resulta na atualização de contadores encadeados (MOD 6, MOD 10 e MOD 24).
+
+Para a interface com o usuário, implementou-se um sistema de exibição composto por decodificadores BCD para 7 segmentos, garantindo a conversão correta dos valores binários em sinais visuais.
+
+Como diferencial metodológico, o projeto utiliza o Minecraft Java Edition como plataforma de prototipagem. Através das propriedades da redstone, que permite a abstração de sistemas binários (estados 0 e 1), foi possível validar o uso deste jogo como método pedagógico acerca dos conceitos de lógica sequencial e combinacional, em um ambiente tridimensional e abstrato das limitações físicas.
+
+Para viabilizar circuitos complexos e mitigar limitações de propagação e atraso inerentes ao jogo, foram aplicados modificadores que implementam conceitos de \textit{Wired Redstone} e barramentos de sinal instantâneos, permitindo uma transição fluida entre teoria digital e implementação prática.
+

@@ -1,0 +1,88 @@
+\subsection{Contador Síncrono MOD 24}
+
+\paragraph{Incremento}
+
+A operação de incremento realiza a transição:
+\[
+D \mapsto (D + 1) \mod 24
+\]
+
+Monta-se a tabela verdade para a função de incremento, considerando as 24 combinações válidas de entrada e suas respectivas saídas:
+
+\begin{center}
+\begin{tabular}{c|ccccccc}
+$D$ & $O_{11}$ & $O_{10}$ & $O_{03}$ & $O_{02}$ & $O_{01}$ & $O_{00}$ & $Carry$\\
+\hline
+$0$  & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+$1$  & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+$\vdots$ & & & & & & & \\
+$22$ & 1 & 0 & 1 & 1 & 1 & 1 & 0\\
+$23$ & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+\end{tabular}
+\end{center}
+
+Devido a extensáo do número de bits, a tabela é apresentada de forma resumida. A tabela completa pode ser encontrada no código-fonte do projeto no github (\url{https://url.github.com/}).
+
+A partir da tabela verdade, obtêm-se as seguintes expressões booleanas:
+
+\begin{align*}
+O_{11} &= D_{10} D_{03} D_{00} \lor D_{11} \overline{D_{01}} \lor D_{11} \overline{D_{00}} \\
+O_{10} &= \overline{D_{10}} D_{03} D_{00} \lor D_{10} \overline{D_{03}} \lor D_{10} \overline{D_{00}} \\
+O_{03} &= D_{02} D_{01} D_{00} \lor D_{03} \overline{D_{00}} \\
+O_{02} &= \overline{D_{11}} \overline{D_{02}} D_{01} D_{00} \lor D_{02} \overline{D_{01}} \lor D_{02} \overline{D_{00}} \\
+O_{01} &= \overline{D_{03}} \overline{D_{01}} D_{00} \lor D_{01} \overline{D_{00}} \\
+O_{00} &= \overline{D_{00}} \\
+Carry &= D_{11} D_{01} D_{00}
+\end{align*}
+
+O sinal $Carry$ indica overflow, isto é, a transição de $23$ para $0$.
+
+As Figuras~\ref{fig:incmod24.png} e~\ref{fig:incmod24-red.png} apresentam a implementação do circuito.
+
+\imgbig{incmod24.png}{Circuito lógico para incremento em módulo 24.}
+\imgbig{incmod24-red.png}{Implementação em redstone do circuito de incremento em módulo 24.}
+
+\paragraph{Decremento}
+
+A operação de decremento realiza a transição:
+\[
+D \mapsto (D - 1) \mod 24
+\]
+
+A tabela correspondente é:
+
+\begin{center}
+\begin{tabular}{c|ccccccc}
+$D$ & $O_{11}$ & $O_{10}$ & $O_{03}$ & $O_{02}$ & $O_{01}$ & $O_{00}$ & $Carry$\\
+\hline
+$0$  & 1 & 0 & 1 & 0 & 1 & 1 & 1\\
+$1$  & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+$\vdots$ & & & & & & & \\
+$23$ & 1 & 1 & 1 & 1 & 1 & 1 & 0\\
+\end{tabular}
+\end{center}
+
+As expressões booleanas minimizadas são:
+
+\begin{align*}
+Carry &= \overline{D_{11}} \overline{D_{10}} \overline{D_{03}} \overline{D_{02}} \overline{D_{01}} \overline{D_{00}} \\
+O_{11} &= \overline{D_{11}} \overline{D_{10}} \overline{D_{03}} \overline{D_{02}} \overline{D_{01}} \overline{D_{00}} \lor D_{11} D_{00} \lor D_{11} D_{01} \\
+O_{10} &= D_{10}(D_{00} \lor D_{01} \lor D_{02} \lor D_{03}) \lor D_{11} \overline{D_{01}} \overline{D_{00}} \\
+O_{03} &= D_{03} D_{00} \lor D_{10} \overline{D_{03}} \overline{D_{02}} \overline{D_{01}} \overline{D_{00}} \lor D_{11} \overline{D_{01}} \overline{D_{00}} \\
+O_{02} &= D_{02} D_{00} \lor D_{02} D_{01} \lor D_{03} \overline{D_{00}} \\
+O_{01} &= \overline{D_{11}} \overline{D_{10}} \overline{D_{01}} \overline{D_{00}} \lor D_{01} D_{00} \lor D_{02} \overline{D_{01}} \overline{D_{00}} \lor D_{03} \overline{D_{00}} \\
+O_{00} &= \overline{D_{00}}
+\end{align*}
+
+Neste caso, o sinal $Carry$ indica underflow, ou seja, a transição de $0$ para $23$.
+
+As Figuras~\ref{fig:decmod24.png} e~\ref{fig:decmod24-red.png} mostram a implementação do circuito.
+
+\imgbig{decmod24.png}{Circuito lógico para decremento em módulo 24.}
+\imgbig{decmod24-red.png}{Implementação em redstone do circuito de decremento em módulo 24.}
+
+\paragraph{Considerações de Projeto}
+
+Embora funcional, o contador não é autocorretivo, pois estados inválidos não são redirecionados ao ciclo válido.
+
+Uma abordagem mais robusta consiste em tratar estados inválidos como condições de correção ou como \textit{don't care} na minimização lógica.

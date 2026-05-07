@@ -1,0 +1,72 @@
+\subsection{Máquina de Estados Finita}
+
+Uma máquina de estados é um modelo matemático utilizado para descrever sistemas que evoluem ao longo do tempo de acordo com entradas e estados internos. Em termos de circuitos digitais, ela representa formalmente sistemas sequenciais, nos quais a saída depende não apenas das entradas atuais, mas também do estado armazenado previamente em memória.
+
+Uma Máquina de Estados Finita (FSM - Finite State Machine) é um modelo no qual o número de estados possíveis é limitado. Cada estado representa uma configuração discreta do sistema, e as transições entre estados são definidas por regras lógicas baseadas nas entradas e no estado atual.
+
+Formalmente, uma FSM pode ser descrita por uma quíntupla:
+
+\[
+FSM = (Q, \Sigma, \delta, q_0, F)
+\]
+
+onde:
+\begin{itemize}
+    \item $Q$ é o conjunto finito de estados
+    \item $\Sigma$ é o conjunto de entradas
+    \item $\delta$ é a função de transição de estados
+    \item $q_0$ é o estado inicial
+    \item $F$ é o conjunto de estados finais (opcional em sistemas cíclicos)
+\end{itemize}
+
+\subsubsection{Cronômetro como Máquina de Estados}
+
+No contexto deste projeto, o cronômetro pode ser modelado como uma máquina de estados finita composta por três subsistemas sequenciais encadeados, representando segundos, minutos e horas.
+
+Cada estado global do sistema pode ser definido como uma tupla:
+
+\[
+\mathcal{S} = (H, M, S, D)
+\]
+
+onde:
+
+\begin{align*}
+H &\in [0, 23] \quad \text{representa as horas} \\
+M &\in [0, 59] \quad \text{representa os minutos} \\
+S &\in [0, 59] \quad \text{representa os segundos} \\
+D &\in \{0,1\} \quad \text{representa a direção (0 = crescente, 1 = decrescente)}
+\end{align*}
+
+Como será detalhado posteriormente, os elementos $M$ e $S$ são implementados internamente como pares de dígitos decimais, divididos em dezena e unidade, tais que:
+
+\[
+M = (M_{dezena}, M_{unidade}), \quad S = (S_{dezena}, S_{unidade})
+\]
+
+com:
+
+\[
+M_{dezena}, S_{dezena} \in [0,5], \quad
+M_{unidade}, S_{unidade} \in [0,9]
+\]
+
+O conjunto de estados válidos do sistema é, portanto, finito e dado por:
+
+\[
+|\mathcal{S}| = 24 \cdot 60 \cdot 60 \cdot 2
+\]
+
+Seja  $S_t$  o estado global do sistema em determinado momento $t$, a função de transição de estados pode ser descrita genericamente por:
+
+\[
+\delta(\mathcal{S}_t) = \mathcal{S}_{t+1}
+\]
+
+ou, de forma expandida:
+
+\[
+\delta(H_t, M_t, S_t, D_t) = (H_{t+1}, M_{t+1}, S_{t+1}, D_{t+1})
+\]
+
+Retornaremos a esta definição mais à frente no documento.

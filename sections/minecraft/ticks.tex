@@ -1,0 +1,7 @@
+\subsection{A Unidade de Tempo: Game Ticks e Redstone Ticks}
+Diferente de circuitos eletrônicos físicos, onde a propagação é quase instantânea, o processamento da Redstone é discreto e baseado em \textit{ticks}. É fundamental distinguir as duas unidades de medida utilizadas no motor do jogo:
+
+\begin{itemize} 
+	\item \textbf{Game Tick (GT):} É a unidade mínima de processamento do jogo. O Minecraft busca processar 20 GT por segundo, o que significa que 1 GT equivale a \textbf{0,05 segundos} (50ms).
+	 \item \textbf{Redstone Tick (RT):} A maioria dos componentes lógicos opera em intervalos de 2 Game Ticks. Portanto, 1 RT equivale a 0,1 segundos. Este é o "passo" padrão para a atualização de estados em circuitos síncronos dentro do jogo. 
+\end{itemize}

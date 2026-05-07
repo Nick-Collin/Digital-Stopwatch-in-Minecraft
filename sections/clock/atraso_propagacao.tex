@@ -1,0 +1,29 @@
+\subsection{Atraso de Propagação em Circuitos}
+
+Em circuitos digitais reais, as transições de sinal não ocorrem de forma instantânea. Cada elemento lógico introduz um atraso entre a aplicação de uma entrada e a estabilização da saída, denominado atraso de propagação ($t_p$).
+
+Como consequência, diferentes partes do circuito podem, temporariamente, operar sobre valores inconsistentes de um mesmo sinal. Em circuitos com realimentação, esse fenômeno pode levar a oscilações ou transições espúrias.
+
+O uso de um sinal de clock mitiga esse problema ao restringir as mudanças de estado a instantes discretos, nos quais se assume que os sinais já se estabilizaram.
+
+Considere um circuito combinacional que implementa uma função booleana $f : X \rightarrow Y$. Em um modelo ideal, a saída $y \in Y$ é dada por:
+
+\[
+y(t) = f(x(t))
+\]
+
+Em um circuito físico, entretanto, a resposta da saída é retardada pelo atraso de propagação. Um modelo temporal mais realista é dado por:
+
+\[
+y(t + t_p) = f(x(t))
+\]
+
+ou, de forma equivalente,
+
+\[
+y(t) = f(x(t - t_p))
+\]
+
+Essas expressões indicam que a saída em um dado instante depende de valores passados da entrada, refletindo o comportamento causal do sistema físico.
+
+Esta problemática também está presente nos circuitos de redstone, como será discutido na seção \nameref{sec:dff}.

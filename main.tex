@@ -1,0 +1,100 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{amsfonts} 
+\usepackage[protrusion=true, expansion=false]{microtype}
+\usepackage[colorlinks=true,
+            linkcolor=black,
+            citecolor=black,
+            urlcolor=blue]{hyperref}
+\geometry{margin=2.5cm}
+
+% Melhorias de formatação
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\imgfull}[2]{
+    \begin{figure}[htbp]
+   	\centering
+   	\includegraphics[width=\linewidth]{images/#1}
+  	 \caption{#2}
+   	\label{fig:sincrono-time-diagram}
+\end{figure}
+}
+
+\newcommand{\img}[5]{
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=#5\linewidth]{images/#1}
+    \caption{#2%}
+    \ifx&#4&%
+    \else\\ \small Fonte: #4%
+    \fi}
+    \label{#3}
+\end{figure}
+}
+
+\newcommand{\imgbig}[2]{
+    \begin{figure}[htbp]
+   	\centering
+   	\includegraphics[width=0.7\linewidth]{images/#1}
+  	 \caption{#2}
+   	\label{fig:sincrono-time-diagram}
+\end{figure}
+}
+
+\newcommand{\imgmedium}[2]{
+    \begin{figure}[htbp]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/#1}
+  	 \caption{#2}
+   	\label{fig:assincrono-time-diagram}
+\end{figure}
+}
+
+\newcommand{\imgsmall}[2]{
+    \begin{figure}[htbp]
+   	\centering
+   	\includegraphics[width=0.3\linewidth]{images/#1}
+  	 \caption{#2}
+   	\label{fig:assincrono-circuit}
+\end{figure}
+}
+
+\title{Projeto e Implementação de um Cronômetro Digital HH:MM:SS Bidirecional:\\
+Da Lógica Fundamental no Logisim à Prototipagem em Redstone}
+\author{Nicolas do Amaral Ferreira de Pinho}
+\date{03/05/2026}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+
+\include{chapters/01_introducao}
+\include{chapters/02_fundamentos}
+\include{chapters/03_minecraft}
+\include{chapters/04_interface}
+\include{chapters/05_clock}
+\include{chapters/06_memoria}
+\include{chapters/07_contadores}
+\include{chapters/08_integracao}
+\include{chapters/09_conclusao}
+
+\section{Referencias}
+
+%\bibliography{bibliography}
+\printbibliography
+
+\end{document}

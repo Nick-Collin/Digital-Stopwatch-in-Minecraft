@@ -1,0 +1,94 @@
+\subsection{Tabelas Verdade}
+
+A tabela-verdade é uma das formas de representar uma função booleana. Ela lista todas as combinações possíveis das variáveis de entrada e associa a cada uma delas o valor correspondente da saída.
+
+Para um sistema com $n$ entradas, existem $2^n$ combinações possíveis, e portanto a tabela-verdade possui $2^n$ linhas.
+
+A partir da tabela-verdade, é possível derivar expressões algébricas equivalentes utilizando a Álgebra Booleana, o que permite manipular e simplificar a função lógica para implementação eficiente em circuitos.
+
+Por exemplo, suponha um circuito que descreva se João vai sair de casa. João é o típico estudante de computação: passa longos períodos imerso em jogos como Minecraft e evita interações sociais sempre que possível.
+
+Na prática, João só sai de casa em situações bem específicas. Ele sai quando falta luz e não é fim de semana, já que nesses dias a ausência de distrações digitais o força a considerar outras atividades. Porém, existe uma exceção importante: nos finais de semana, João costuma sair de casa se estiver chovendo, pois o parque que ele frequenta fica vazio nessas condições, o que atende perfeitamente à sua preferência por ambientes com poucas pessoas.
+
+Nesse contexto, pode-se construir a seguinte tabela verdade:
+
+Seja: \\
+\begin{itemize}
+    \item $A$: falta de luz
+    \item $B$: é fim de semana
+    \item $C$: está chovendo
+    \item $X$: João sai de casa
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{ccc|c}
+$A$ & $B$ & $C$ & $X$ \\
+\hline
+0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 1 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 1 \\
+\end{tabular}
+\end{center}
+
+Nesse caso, é trivial deduzir a equação: 
+
+\begin{center}
+$X = (A \land \lnot{B}) \lor (B \land C)$
+\end{center}
+
+\subsection{Mapa de Karnaugh}
+
+O mapa de Karnaugh (K-map) é uma técnica gráfica utilizada para simplificar funções booleanas a partir de sua tabela-verdade. Ele organiza os valores da tabela em uma grade estruturada de modo que células adjacentes diferem em apenas uma única variável.
+
+Essa organização permite identificar padrões e agrupar estados onde a saída é igual a 1 em blocos de tamanho potência de dois (como 2, 4 ou 8 células). Cada agrupamento representa uma simplificação da expressão lógica, eliminando variáveis desnecessárias.
+
+Essa simplificação reduz a complexidade do circuito, diminuindo o número de portas lógicas, conexões e, consequentemente, o custo e a probabilidade de falhas.
+
+Retomando o exemplo anterior, podemos utilizar o mapa de Karnaugh para visualizar como a função que descreve o comportamento de João emerge a partir da tabela-verdade.
+
+Para três variáveis ($A$, $B$, $C$), o mapa de Karnaugh é organizado da seguinte forma:
+
+\begin{center}
+\begin{tabular}{c|cccc}
+ & $BC=00$ & $BC=01$ & $BC=11$ & $BC=10$ \\
+\hline
+$A=0$ & 0 & 0 & 1 & 0 \\
+$A=1$ & 1 & 1 & 1 & 0 \\
+\end{tabular}
+\end{center}
+
+Observa-se que os agrupamentos de valores 1 podem ser divididos em dois blocos:
+
+\begin{itemize}
+    \item Um agrupamento cobrindo os casos onde $A = 1$ e $B = 0$
+    \item Outro agrupamento cobrindo os casos onde $B = 1$ e $C = 1$
+\end{itemize}
+
+Dessa forma, a função simplificada permanece:
+
+\[
+X = (A \land \lnot B) \lor (B \land C)
+\]
+
+O uso do mapa de Karnaugh permite visualizar claramente a estrutura da função e confirmar que não há variáveis redundantes em nenhuma das parcelas.
+
+Isso reforça a ideia de que a simplificação lógica não necessariamente reduz uma função a um único termo, mas sim à forma mínima equivalente em termos de agrupamento booleano.
+
+
+\subsection{Circuitos Combinacionais e Sequenciais}
+
+Os circuitos dividem-se em duas arquiteturas principais: 
+
+\begin{itemize}
+ \item \textbf{Combinacionais:} A saída depende estritamente do estado atual das entradas.
+ \item \textbf{Sequenciais:} A saída depende tanto das entradas atuais quanto de estados passados armazenados na memória. 
+\end{itemize} 
+
+Para um cronômetro, a lógica sequencial é obrigatória, pois o sistema precisa "lembrar" o segundo anterior para calcular o próximo valor. 
+Isso é alcançado através de elementos de memória chamados Flip-Flops (como o tipo D ou JK), que sincronizam as transições de estado através de um sinal periódico denominado Clock. 
+No projeto em questão, contadores de diferentes módulos (MOD 6, MOD 10 e MOD 24) são encadeados para representar a passagem do tempo em segundos, minutos e horas.

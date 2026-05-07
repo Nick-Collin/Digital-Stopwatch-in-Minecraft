@@ -1,0 +1,34 @@
+\section{Clock}
+
+Embora o tempo físico seja contínuo, sistemas digitais operam a partir de amostragens discretas desse domínio. Nesse contexto, a evolução do sistema é modelada como uma sequência de estados indexados por instantes discretos $t \in \mathbb{N}$.
+
+Como descrito na seção \textbf{\nameref{sec:cronometro}}, o cronômetro, enquanto uma Máquina de Estados Finita (FSM), possui seu estado definido pela tupla $(H_t, M_t, S_t, D_t)$ no instante $t$.
+
+Para que essa modelagem discreta seja consistente com o comportamento físico do circuito, é necessário um mecanismo que determine de forma precisa quando as transições de estado devem ocorrer.
+
+O clock cumpre esse papel, atuando como uma referência temporal global que define os instantes de amostragem do sistema e sincroniza todos os seus componentes.
+
+O clock impõe uma ordem temporal ao sistema, evitando transições concorrentes e garantindo que a função de transição $\delta$ seja aplicada de forma determinística:
+
+\[
+S_t \xrightarrow{\delta} S_{t+1}
+\]
+
+sem ambiguidades causadas por atrasos de propagação nos componentes lógicos.
+
+Trata-se de um sinal periódico que alterna entre níveis lógicos alto (1) e baixo (0), estabelecendo uma estrutura temporal comum para o circuito. 
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/clock-waveform.png}
+    \caption{Onda de clock}
+    \label{fig:clock-waveform}
+\end{figure}
+
+\input{sections/clock/propiedades}
+\input{sections/clock/atraso_propagacao}
+\input{sections/clock/estrutura_fisica}
+\input{sections/clock/estrutura_redstone}
+\input{sections/clock/borda}
+\input{sections/clock/consideracoes}
+\input{sections/clock/setup_hold}

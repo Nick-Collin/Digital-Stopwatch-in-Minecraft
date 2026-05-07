@@ -1,0 +1,1702 @@
+\documentclass[a4paper,12pt]{article}
+
+%\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{amsfonts} 
+%\usepackage[protrusion=true, expansion=false]{microtype}
+\geometry{margin=2.5cm}
+
+% Melhorias de formatação
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.5em}
+
+\title{Projeto e Implementação de um Cronômetro Digital HH:MM:SS Bidirecional:\\
+Da Lógica Fundamental no Logisim à Prototipagem em Redstone}
+\author{Nicolas do Amaral Ferreira de Pinho}
+\date{03/05/2026}
+
+\begin{document}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introdução}
+
+Este trabalho apresenta o desenvolvimento de um cronômetro digital completo no formato HH:MM:SS, operando com lógica de contagem crescente e decrescente. O projeto fundamenta-se na utilização exclusiva de lógica digital básica no ambiente Logisim Evolution, respeitando a restrição rigorosa de não utilizar circuitos integrados prontos.
+
+Esta abordagem visa consolidar o entendimento profundo de blocos fundamentais, como portas lógicas, somadores de 4 bits e unidades de armazenamento de estado. A arquitetura do sistema é estritamente modular, seguindo um fluxo de processamento que parte da geração de um sinal de clock periódico, passa por uma unidade de controle e resulta na atualização de contadores encadeados (MOD 6, MOD 10 e MOD 24).
+
+Para a interface com o usuário, implementou-se um sistema de exibição composto por decodificadores BCD para 7 segmentos, garantindo a conversão correta dos valores binários em sinais visuais.
+
+Como diferencial metodológico, o projeto utiliza o Minecraft Java Edition como plataforma de prototipagem. Através das propriedades da redstone, que permite a abstração de sistemas binários (estados 0 e 1), foi possível validar o uso deste jogo como método pedagógico acerca dos conceitos de lógica sequencial e combinacional, em um ambiente tridimensional e abstrato das limitações físicas.
+
+Para viabilizar circuitos complexos e mitigar limitações de propagação e atraso inerentes ao jogo, foram aplicados modificadores que implementam conceitos de \textit{Wired Redstone} e barramentos de sinal instantâneos, permitindo uma transição fluida entre teoria digital e implementação prática.
+
+\newpage
+
+\section{Fundamentação}
+
+\subsection{Representação Binária}
+
+A eletrônica digital baseia-se no bit (binary digit), a menor unidade de informação, que pode assumir apenas dois estados discretos: 0 ou 1. Fisicamente, esses estados são traduzidos por níveis de tensão elétrica, onde o "0" (falso) geralmente corresponde ao aterramento ou ausência de sinal, e o "1" (verdadeiro) a uma tensão positiva, como 5V. Toda a complexidade dos computadores modernos é construída sobre essa abstração lógica binária.
+
+\subsubsection{Sistema Numérico Binário}
+
+O sistema numérico binário é um sistema de base 2, no qual qualquer número é representado utilizando apenas dois dígitos: 0 e 1. Diferentemente do sistema decimal, no qual cada posição representa potências de 10, no sistema binário cada posição representa potências de 2.
+
+Assim, um número binário pode ser interpretado como uma soma ponderada de potências de 2. Por exemplo:
+
+\[
+1011_2 = (1 \cdot 2^3) + (0 \cdot 2^2) + (1 \cdot 2^1) + (1 \cdot 2^0)
+\]
+
+\[
+1011_2 = 8 + 0 + 2 + 1 = 11_{10}
+\]
+
+Essa representação é fundamental na eletrônica digital, pois permite mapear diretamente estados físicos de circuitos elétricos (ligado/desligado) para valores numéricos.
+
+Além disso, o sistema binário é a base para a construção de operações aritméticas em hardware, como soma, subtração e comparação, que podem ser implementadas exclusivamente com portas lógicas.
+
+\subsubsection{Código BCD (Binary Coded Decimal)}
+
+Embora o sistema binário seja eficiente para processamento, ele não é naturalmente adequado para representação direta de números decimais na forma utilizada por humanos.
+
+Para contornar essa limitação, utiliza-se o código BCD (Binary Coded Decimal), no qual cada dígito decimal (0 a 9) é representado individualmente por um grupo de 4 bits.
+
+Por exemplo, o número decimal $45_{10}$ em BCD é representado como:
+
+\[
+45_{10} = 0100\ 0101_{BCD} =  101101_2
+\]
+
+No BCD, apenas combinações de 0000 a 1001 são válidas (0 a 9). Valores de 1010 a 1111 são considerados inválidos.
+
+\subsection{Transistor}
+
+O transistor é o componente semicondutor fundamental da eletrônica moderna, utilizado para controlar o fluxo de corrente elétrica. Existem diferentes tipos de transistores, sendo os principais o transistor bipolar de junção (BJT) e o transistor de efeito de campo (MOSFET).
+
+O BJT possui três terminais: emissor, base e coletor, sendo controlado por corrente. Já o MOSFET, amplamente utilizado em circuitos digitais, possui os terminais gate, source e drain, sendo controlado por tensão.
+
+Em circuitos digitais modernos, especialmente em tecnologias CMOS, os transistores operam predominantemente como chaves (switches), conectando a saída ao nível lógico alto (Vcc) ou baixo (GND), dependendo do sinal de entrada.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/transistor.jpg}
+    \caption{Exemplo de transistor}
+    \label{fig:transistor}
+    {\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+
+\subsubsection{MOSFET tipo N e tipo P}
+
+Os MOSFETs (Metal-Oxide-Semiconductor Field-Effect Transistors) são amplamente utilizados em circuitos digitais modernos e são controlados por tensão aplicada ao terminal gate.
+
+Existem dois tipos principais:
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/NMOS-PMOS.jpg}
+  	 \caption{MOSFET tipo N e tipo P}
+   	\label{nmos-pmos-transistors}
+	{\footnotesize Fonte: \url{https://www.langirswitch.com}}
+\end{figure}
+
+\begin{itemize}
+    \item NMOS: conduz corrente quando a tensão no gate é alta (nível lógico 1). Nesse caso, o transistor conecta a saída ao nível lógico baixo (GND).
+    
+    \item PMOS: conduz corrente quando a tensão no gate é baixa (nível lógico 0). Nesse caso, o transistor conecta a saída ao nível lógico alto (Vcc).
+\end{itemize}
+
+Em circuitos CMOS (\textit{Complementaty Metal Oxide Semiconductor}), os transistores NMOS e PMOS são utilizados de forma complementar, permitindo maior eficiência energética e evitando consumo estático de corrente.
+
+
+\subsubsection{BJT tipo NPN e PNP}
+
+Os transistores bipolares de junção (BJT) são dispositivos controlados por corrente, possuindo três terminais: emissor, base e coletor.
+
+Existem dois tipos principais:
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/npn-pnp-transistors.jpg}
+  	 \caption{BJT tipo NPN e PNP}
+   	\label{npn-pnp-transistors}
+	{\footnotesize Fonte: \url{https://www.langirswitch.com}}
+\end{figure}
+
+\begin{itemize}
+    \item {NPN}: conduz corrente entre coletor e emissor quando há corrente entrando na base. É ativado por um sinal positivo na base em relação ao emissor.
+    
+    \item {PNP}: conduz corrente quando há corrente saindo da base. É ativado por um sinal negativo na base em relação ao emissor.
+\end{itemize}
+
+Diferentemente dos MOSFETs, os BJTs exigem corrente contínua na base para se manterem ativos, o que os torna menos eficientes para aplicações digitais modernas.
+
+\subsection{Portas Lógicas}
+
+Portas lógicas são circuitos eletrônicos que utilizam transistores para realizar operações matemáticas sob Álgebra Booleana. Elas recebem sinais binários de entrada e processam uma única saída lógica.
+
+\subsubsection{Not}
+
+A porta lógica NOT (inversora) é responsável por inverter o sinal de entrada: quando a entrada é 1, a saída é 0, e vice-versa.
+
+\begin{align*}
+	y &= \neg x
+\end{align*}
+
+\begin{center}
+\begin{tabular}{c|c}
+$x$&$y$\\
+\hline
+$0$&$1$\\
+$1$&$0$\\
+
+\end{tabular}
+\end{center}
+
+Em implementações mais simples, a porta NOT pode ser construída com um único transistor e resistores. No entanto, em circuitos digitais modernos, utiliza-se a tecnologia CMOS, que emprega dois transistores: um do tipo PMOS e outro do tipo NMOS.
+
+Nessa configuração, os transistores atuam de forma complementar: quando o sinal de entrada é baixo, o transistor PMOS conduz e conecta a saída ao nível lógico alto (Vcc); quando o sinal de entrada é alto, o transistor NMOS conduz e conecta a saída ao nível lógico baixo (GND).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/not-circuit.png}
+    \caption{Circuito de uma porta NOT}
+    \label{fig:not-circuit}
+\end{figure}
+
+Utilizamos esta notação para esse circúito:
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/not-gate.png}
+  	 \caption{Notação Not}
+   	\label{fig:not-gate}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+
+\subsubsection{OR}
+
+A porta lógica OR produz saída 1 quando pelo menos uma das entradas está em nível lógico 1.
+
+\begin{align*}
+    x = a \lor b
+\end{align*}
+
+\begin{center}
+\begin{tabular}{cc|c}
+$a$ & $b$ & $x$ \\
+\hline
+0 & 0 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & 1 \\
+1 & 1 & 1 \\
+\end{tabular}
+\end{center}
+
+Uma implementação clássica da porta OR pode ser derivada a partir da porta NOR (Not Or). Em CMOS, a NOR é construída com transistores PMOS em série no pull-up network e NMOS em paralelo no pull-down network. A função OR pode então ser obtida pela inversão da saída da NOR.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/or-circuit.png}
+    \caption{Implementação CMOS pull down de uma porta OR}
+    \label{fig:or-circuit}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/or-gate.png}
+    \caption{Símbolo lógico da porta OR}
+    \label{fig:or-gate}
+\end{figure}
+
+\subsubsection{And}
+
+ A porta And resulta em saída 1 se e somente se as duas entradas estiverem no estado lógico 1. 
+
+\begin{align*}
+	x = b \land a
+\end{align*}
+
+\begin{center}
+\begin{tabular}{cc|c}
+$a$&$b$&$x$\\
+\hline
+$0$&$0$&$0$\\
+$0$&$1$&$0$\\
+$1$&$0$&$0$\\
+$1$&$1$&$1$\\
+
+\end{tabular}
+\end{center}
+
+A implementação direta da porta AND em CMOS não é a forma mais eficiente. Na prática, constrói-se a porta NAND (Not And) utilizando transistores NMOS em série no pull-down e PMOS em paralelo no pull-up. Em seguida, aplica-se uma inversão para obter a função AND.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/and-circuit.png}
+  	 \caption{Circuito CMOS pull-down de uma porta And}
+   	\label{fig:or-circuit}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+Utilizamos esta notação para esse circúito:
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/and-gate.png}
+  	 \caption{Notação And}
+   	\label{fig:not-gate}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsubsection{XOR}
+
+A porta lógica XOR (Exclusive OR) produz saída 1 quando as entradas são diferentes, e 0 quando são iguais.
+
+\begin{align*}
+    x = a \oplus b
+\end{align*}
+
+\begin{center}
+\begin{tabular}{cc|c}
+$a$ & $b$ & $x$ \\
+\hline
+0 & 0 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+\end{tabular}
+\end{center}
+
+Também pode ser expressa como:
+
+\begin{align*}
+    x = (a \land \neg b) \lor (\neg a \land b)
+\end{align*}
+
+%Diferentemente das portas AND e OR, a XOR não é diretamente implementada de forma eficiente em CMOS com uma única estrutura pull-up/pull-down simples. Em vez disso, sua implementação é tipicamente construída a partir da combinação de portas básicas, derivada da manipulação algébrica demonstrada acima.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/xor-circuit.png}
+    \caption{Implementação lógica de uma porta XOR}
+    \label{fig:xor-circuit}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/xor-gate.png}
+    \caption{Símbolo lógico da porta XOR}
+    \label{fig:xor-gate}
+\end{figure}
+
+%Alternativamente, em circuitos CMOS otimizados, a XOR pode ser implementada com redes de transmissão (\textit{transmission gates}), reduzindo o número de transistores e melhorando o desempenho, entretanto, para o presente documento, isso serve somente à título de curiosidade.
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.6\linewidth]{images/xor-gate-cmos.png}
+%    \caption{Símbolo lógico da porta XOR}
+%    \label{fig:xor-gate}
+%\end{figure}W
+
+A porta XOR é fundamental na implementação de circuitos aritméticos, especialmente somadores binários (half-adder e full-adder), sendo responsável pelo cálculo do bit de soma.
+ 
+\subsection{Tabelas Verdade}
+
+A tabela-verdade é uma das formas de representar uma função booleana. Ela lista todas as combinações possíveis das variáveis de entrada e associa a cada uma delas o valor correspondente da saída.
+
+Para um sistema com $n$ entradas, existem $2^n$ combinações possíveis, e portanto a tabela-verdade possui $2^n$ linhas.
+
+A partir da tabela-verdade, é possível derivar expressões algébricas equivalentes utilizando a Álgebra Booleana, o que permite manipular e simplificar a função lógica para implementação eficiente em circuitos.
+
+Por exemplo, suponha um circuito que descreva se João vai sair de casa. João é o típico estudante de computação: passa longos períodos imerso em jogos como Minecraft e evita interações sociais sempre que possível.
+
+Na prática, João só sai de casa em situações bem específicas. Ele sai quando falta luz e não é fim de semana, já que nesses dias a ausência de distrações digitais o força a considerar outras atividades. Porém, existe uma exceção importante: nos finais de semana, João costuma sair de casa se estiver chovendo, pois o parque que ele frequenta fica vazio nessas condições, o que atende perfeitamente à sua preferência por ambientes com poucas pessoas.
+
+Nesse contexto, pode-se construir a seguinte tabela verdade:
+
+Seja: \\
+\begin{itemize}
+    \item $A$: falta de luz
+    \item $B$: é fim de semana
+    \item $C$: está chovendo
+    \item $X$: João sai de casa
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{ccc|c}
+$A$ & $B$ & $C$ & $X$ \\
+\hline
+0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 1 \\
+1 & 0 & 1 & 1 \\
+1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 1 \\
+\end{tabular}
+\end{center}
+
+Nesse caso, é trivial deduzir a equação: 
+
+\begin{center}
+$X = (A \land \lnot{B}) \lor (B \land C)$
+\end{center}
+
+\subsection{Mapa de Karnaugh}
+
+O mapa de Karnaugh (K-map) é uma técnica gráfica utilizada para simplificar funções booleanas a partir de sua tabela-verdade. Ele organiza os valores da tabela em uma grade estruturada de modo que células adjacentes diferem em apenas uma única variável.
+
+Essa organização permite identificar padrões e agrupar estados onde a saída é igual a 1 em blocos de tamanho potência de dois (como 2, 4 ou 8 células). Cada agrupamento representa uma simplificação da expressão lógica, eliminando variáveis desnecessárias.
+
+Essa simplificação reduz a complexidade do circuito, diminuindo o número de portas lógicas, conexões e, consequentemente, o custo e a probabilidade de falhas.
+
+Retomando o exemplo anterior, podemos utilizar o mapa de Karnaugh para visualizar como a função que descreve o comportamento de João emerge a partir da tabela-verdade.
+
+Para três variáveis ($A$, $B$, $C$), o mapa de Karnaugh é organizado da seguinte forma:
+
+\begin{center}
+\begin{tabular}{c|cccc}
+ & $BC=00$ & $BC=01$ & $BC=11$ & $BC=10$ \\
+\hline
+$A=0$ & 0 & 0 & 1 & 0 \\
+$A=1$ & 1 & 1 & 1 & 0 \\
+\end{tabular}
+\end{center}
+
+Observa-se que os agrupamentos de valores 1 podem ser divididos em dois blocos:
+
+\begin{itemize}
+    \item Um agrupamento cobrindo os casos onde $A = 1$ e $B = 0$
+    \item Outro agrupamento cobrindo os casos onde $B = 1$ e $C = 1$
+\end{itemize}
+
+Dessa forma, a função simplificada permanece:
+
+\[
+X = (A \land \lnot B) \lor (B \land C)
+\]
+
+O uso do mapa de Karnaugh permite visualizar claramente a estrutura da função e confirmar que não há variáveis redundantes em nenhuma das parcelas.
+
+Isso reforça a ideia de que a simplificação lógica não necessariamente reduz uma função a um único termo, mas sim à forma mínima equivalente em termos de agrupamento booleano.
+
+
+\subsection{Circuitos Combinacionais e Sequenciais}
+
+Os circuitos dividem-se em duas arquiteturas principais: 
+
+\begin{itemize}
+ \item \textbf{Combinacionais:} A saída depende estritamente do estado atual das entradas.
+ \item \textbf{Sequenciais:} A saída depende tanto das entradas atuais quanto de estados passados armazenados na memória. 
+\end{itemize} 
+
+Para um cronômetro, a lógica sequencial é obrigatória, pois o sistema precisa "lembrar" o segundo anterior para calcular o próximo valor. 
+Isso é alcançado através de elementos de memória chamados Flip-Flops (como o tipo D ou JK), que sincronizam as transições de estado através de um sinal periódico denominado Clock. 
+No projeto em questão, contadores de diferentes módulos (MOD 6, MOD 10 e MOD 24) são encadeados para representar a passagem do tempo em segundos, minutos e horas.
+
+\subsection{Máquina de Estados Finita}
+
+Uma máquina de estados é um modelo matemático utilizado para descrever sistemas que evoluem ao longo do tempo de acordo com entradas e estados internos. Em termos de circuitos digitais, ela representa formalmente sistemas sequenciais, nos quais a saída depende não apenas das entradas atuais, mas também do estado armazenado previamente em memória.
+
+Uma Máquina de Estados Finita (FSM - Finite State Machine) é um modelo no qual o número de estados possíveis é limitado. Cada estado representa uma configuração discreta do sistema, e as transições entre estados são definidas por regras lógicas baseadas nas entradas e no estado atual.
+
+Formalmente, uma FSM pode ser descrita por uma quíntupla:
+
+\[
+FSM = (Q, \Sigma, \delta, q_0, F)
+\]
+
+onde:
+\begin{itemize}
+    \item $Q$ é o conjunto finito de estados
+    \item $\Sigma$ é o conjunto de entradas
+    \item $\delta$ é a função de transição de estados
+    \item $q_0$ é o estado inicial
+    \item $F$ é o conjunto de estados finais (opcional em sistemas cíclicos)
+\end{itemize}
+
+\subsubsection{Cronômetro como Máquina de Estados}
+
+No contexto deste projeto, o cronômetro pode ser modelado como uma máquina de estados finita composta por três subsistemas sequenciais encadeados, representando segundos, minutos e horas.
+
+Cada estado global do sistema pode ser definido como uma tupla:
+
+\[
+\mathcal{S} = (H, M, S, D)
+\]
+
+onde:
+
+\begin{align*}
+H &\in [0, 23] \quad \text{representa as horas} \\
+M &\in [0, 59] \quad \text{representa os minutos} \\
+S &\in [0, 59] \quad \text{representa os segundos} \\
+D &\in \{0,1\} \quad \text{representa a direção (0 = crescente, 1 = decrescente)}
+\end{align*}
+
+Como será detalhado posteriormente, os elementos $M$ e $S$ são implementados internamente como pares de dígitos decimais, divididos em dezena e unidade, tais que:
+
+\[
+M = (M_{dezena}, M_{unidade}), \quad S = (S_{dezena}, S_{unidade})
+\]
+
+com:
+
+\[
+M_{dezena}, S_{dezena} \in [0,5], \quad
+M_{unidade}, S_{unidade} \in [0,9]
+\]
+
+O conjunto de estados válidos do sistema é, portanto, finito e dado por:
+
+\[
+|\mathcal{S}| = 24 \cdot 60 \cdot 60 \cdot 2
+\]
+
+Seja  $S_t$  o estado global do sistema em determinado momento $t$, a função de transição de estados pode ser descrita genericamente por:
+
+\[
+\delta(\mathcal{S}_t) = \mathcal{S}_{t+1}
+\]
+
+ou, de forma expandida:
+
+\[
+\delta(H_t, M_t, S_t, D_t) = (H_{t+1}, M_{t+1}, S_{t+1}, D_{t+1})
+\]
+
+Retornaremos a esta definição mais à frente no documento.
+
+\newpage
+
+\section{Minecraft}
+
+Minecraft é um jogo eletrônico do tipo sandbox que permite a interação com um ambiente aberto através da manipulação de blocos. Para além do aspecto recreativo, o jogo possui um sistema de simulação física e lógica denominado \textbf{Redstone}. Este sistema permite a criação de circuitos complexos, funcionando como uma abstração prática de sistemas digitais reais. Devido a essa característica, o Minecraft é amplamente utilizado como ferramenta educacional para demonstrar conceitos de eletrônica digital, lógica booleana e arquitetura de computadores.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.6\linewidth]{images/Minecraft.jpg}
+  	 \caption{Capa do Minecraft}
+   	\label{fig:minecraft}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsection{A Unidade de Tempo: Game Ticks e Redstone Ticks}
+Diferente de circuitos eletrônicos físicos, onde a propagação é quase instantânea, o processamento da Redstone é discreto e baseado em \textit{ticks}. É fundamental distinguir as duas unidades de medida utilizadas no motor do jogo:
+
+\begin{itemize} 
+	\item \textbf{Game Tick (GT):} É a unidade mínima de processamento do jogo. O Minecraft busca processar 20 GT por segundo, o que significa que 1 GT equivale a \textbf{0,05 segundos} (50ms).
+	 \item \textbf{Redstone Tick (RT):} A maioria dos componentes lógicos opera em intervalos de 2 Game Ticks. Portanto, 1 RT equivale a 0,1 segundos. Este é o "passo" padrão para a atualização de estados em circuitos síncronos dentro do jogo. 
+\end{itemize}
+
+\subsection{Componentes Vanilla}
+
+Embora seja uma abstração simplificada, o funcionamento do sistema de redstone apresenta paralelos com circuitos digitais reais, especialmente no que diz respeito à propagação de sinais e controle lógico. 
+
+Esse sistema interno é bem complexo e cheio de detalhes, o que segue é um resumo dos principais conceitos e componentes da redstone, que serão necessários para compreensão do projeto. Para mais detalhes, é recomendável consultar a wiki do jogo (\url{https://minecraft.wiki/w/Tutorial:Redstone}).
+
+\subsubsection{Pó de Redstone}
+
+A poeita de redstone atua como meio de transmissão de sinal, análogo a fios em circuitos eletrônicos. Ela transporta um valor de intensidade que varia de 0 a 15, sendo interpretado, em muitos casos, como sinal lógico binário (0 ou 1) ou como hexadecimal (0-15).
+
+A propagação ao longo da poeira é instantânea (0 RT), porém o sinal perde 1 unidade de força a cada bloco percorrido, limitando a transmissão a no máximo 15 blocos sem o uso de repetidores. 
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.2\linewidth]{images/redstone.png}
+  	 \caption{Redstone}
+   	\label{fig:redstone}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsubsection{Tocha de Redstone}
+
+A tocha de Redstone, além de energizar blocos adjacentes quando está ligada, funciona como um inversor lógico. Quando o bloco em que está apoiada recebe energia, ela desliga; quando não recebe, permanece ligada. Esse comportamento permite a inversão de sinais dentro de circuitos.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.3\linewidth]{images/redstone-torch.png}
+  	 \caption{Tocha de Redstone}
+   	\label{fig:tocha-de-redstone}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsubsection{Repetidor de Redstone}
+
+O repetidor é um componente multifuncional projetado para transmitir, amplificar e atrasar sinais. Ele possui duas funções avançadas essenciais para o projeto: 
+
+	 \textbf{Ajuste de Delay:} Pode ser configurado manualmente para introduzir um atraso de 1, 2, 3 ou 4 RTs. 
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.3\linewidth]{images/Redstone_Repeater.png}
+  	 \caption{Repetidor de Redstone}
+   	\label{fig:redstone-repeater}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+	 \textbf{Trava:} Se um repetidor for energizado lateralmente por outro repetidor ou comparador, ele "trava" seu estado atual, ignorando mudanças na entrada traseira. Essa propriedade é frequentemente utilizada para criar memórias de forma compacta.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.34\linewidth]{images/Locked_Redstone_Repeater.png}
+  	 \caption{Repetidor de Redstone Travado}
+   	\label{fig:locked-redstone-repeater}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsubsection{Comparador de Redstone}
+
+O comparador é o componente mais sofisticado do sistema \textit{vanilla}, permitindo operações aritméticas e de comparação com um atraso constante de 1 RT. Ele opera em dois modos:
+
+ \textbf{Modo Comparação (Tocha frontal apagada):} A saída só é ativada se o sinal traseiro for maior ou igual ao maior sinal lateral. 
+
+\textbf{Modo Subtração (Tocha frontal acesa):} A saída emite uma intensidade igual à diferença entre o sinal traseiro e o maior sinal lateral ($saida = max(0, back - max(side inputs))$). Se o resultado for negativo, a saída é 0.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.34\linewidth]{images/redstone-comparator.png}
+  	 \caption{Comparador de Redstone}
+   	\label{fig:redstone-comparator}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+
+\subsubsection{Input/Output}
+
+Componentes como botões, alavancas e placas de pressão atuam como entradas (inputs), fornecendo sinais ao sistema. Já lâmpadas de Redstone e pistões podem ser utilizados como saídas (outputs), respondendo ao estado lógico do circuito.
+
+\subsection{Mods}
+
+Embora o sistema de redstone presente na versão vanilla do jogo já permita a construção de circuitos digitais relativamente complexos, algumas limitações práticas, como atraso de propagação, dificuldade de depuração e alta complexidade estrutural, motivam o uso de modificações (mods) que expandem essas capacidades.
+
+Esses mods introduzem ferramentas e abstrações que aproximam o ambiente do jogo de um contexto mais controlado e analisável, semelhante ao de sistemas digitais reais ou simuladores de hardware.
+
+\subsubsection{Carpet}
+
+O mod Carpet fornece ferramentas avançadas de análise e instrumentação do jogo. Entre suas funcionalidades, destacam-se a medição de desempenho, inspeção de ticks e controle fino do comportamento do sistema.
+
+Essas capacidades permitem observar com maior precisão a execução de circuitos de redstone, facilitando a identificação de gargalos, condições de corrida e inconsistências temporais.
+
+\subsubsection{Wired Redstone}
+
+O mod Wired Redstone introduz um sistema de fiação estruturado que substitui a redstone tradicional por conexões mais organizadas e previsíveis.
+
+Diferentemente da redstone vanilla, esses fios não sofrem degradação de sinal ao longo da distância, eliminando a necessidade de repetidores.
+
+\textbf{Principais itens:}
+\begin{itemize}
+    \item \textbf{Red Alloy Wire}: fio condutor básico sem perda de sinal.
+    \item \textbf{Insulated Wire}: fios isolados por cor, permitindo múltiplos sinais independentes em paralelo.
+    \item \textbf{Bundled Cable}: permite transmitir vários sinais simultaneamente em um único bloco (barramento multi-bit).
+    \item \textbf{Gate Components}: componentes lógicos (AND, OR, NOT, etc.) integrados ao sistema de fios.
+	\item \textbf{Repetidor de Redstone}: o mod adiciona uma alternativa do repetidor de redstone \textit{vanilla} com personalização do atraso em ticks gerado.
+\end{itemize}
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.7\linewidth]{images/wired-redstone.png}
+  	 \caption{Fios de Redstone}
+   	\label{fig:wired-redstone}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+
+\subsubsection{Wireless Redstone}
+
+O mod Wireless Redstone introduz comunicação sem fio entre componentes, eliminando completamente a necessidade de conexões físicas.
+
+O funcionamento segue o modelo de transceptores: um transmissor envia um sinal em uma determinada frequência/canal, e receptores configurados na mesma frequência reproduzem esse sinal.
+
+\textbf{Principais itens:}
+\begin{itemize}
+    \item \textbf{Transmitter}: envia sinais de redstone para um canal específico.
+    \item \textbf{Receiver}: recebe sinais de um canal e os converte em saída de redstone.
+    \item \textbf{Frequency Selector}: define o canal de comunicação entre dispositivos.
+\end{itemize}
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.7\linewidth]{images/wireless-redstone.png}
+  	 \caption{Transmissor e Receptor}
+   	\label{fig:wireless-redstone}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+
+\subsection{Portas Lógicas de Redstone}
+
+No Minecraft, a implementação de portas lógicas não depende diretamente de transistores físicos, mas sim de abstrações comportamentais do sistema de redstone.
+
+\subsubsection{Or}
+
+No jogo, a porta or é a mais simples de todas, se nossas variaveis $A$ e $B$ propagam em fios opostos, para fazer uma porta Or, basta juntar estes dois fios na saida $X$, já que qualquer um deles pode energizar $X$.
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.7\linewidth]{images/or-redstone.png}
+  	 \caption{Porta Or de Redstone}
+   	\label{fig:or-redstone}
+	%{\footnotesize Fonte: \url{https://autoctrls.com/datasheet-transistor/}}
+\end{figure}
+
+\subsubsection{Not}
+
+A porta lógica NOT (ou inversor) é uma das implementações mais fundamentais em circuitos de Redstone. No Minecraft vanilla, ela é tradicionalmente construída utilizando uma tocha de redstone.
+
+O funcionamento baseia-se no fato de que a tocha de redstone inverte o estado do sinal de entrada:
+quando não há energia na entrada, a tocha permanece ligada, emitindo sinal na saída; quando a entrada é energizada, a tocha desliga, interrompendo o sinal.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/not-redstone.png}
+    \caption{Porta Not de Redstone utilizando tocha}
+    \label{fig:not-redstone}
+\end{figure}
+
+Em algumas modificações do jogo (como o mod citado “Wired Redstone”), a porta NOT pode ser implementada como um componente dedicado, aumentando a eficiência espacial em circuitos complexos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/not-wired-redstone.png}
+    \caption{Porta Not de Redstone do mod Wired Redstone}
+    \label{fig:not-wired-redstone}
+\end{figure}
+
+\subsubsection{And}
+
+No jogo \textit{vanilla}, assim como na vida real, existem várias formas de se implementar o portão and. Entretanto, a forma mais utilizada no jogo é derivada da lei de De Morgan: 
+
+\begin{center}
+$(\lnot(p \land q) \equiv (\lnot p \lor \lnot q)) \iff ((p \land q) \equiv \lnot (\lnot p \lor \lnot q)) $
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/and-circuit-alternative.png}
+    \caption{Circuito alternativo para a porta And}
+    \label{fig:and-circuit-alternative}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/and-redstone.png}
+    \caption{Circuito And de Redstone para Minecraft Vanilla}
+    \label{fig:and-redstone}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/and-wired-redstone.png}
+    \caption{Circuito Integrado And Wired Redstone}
+    \label{fig:and-wired-redstone}
+\end{figure}
+
+\newpage
+
+\section{Componentes do Sistema}
+
+Um cronômetro é um dispositivo responsável por contar a passagem do tempo de forma sequencial e controlada. Neste projeto, deseja-se desenvolver um cronômetro bidirecional, capaz de operar tanto em modo crescente quanto decrescente.
+
+Para isso, o sistema é dividido em três blocos principais: interface com o usuário, geração de clock e lógica sequencial de contagem.
+
+\subsection{Display de 7 Segmentos}
+
+O display de 7 segmentos é o elemento responsável pela representação visual dos valores numéricos do cronômetro. Ele é composto por sete LEDs organizados em formato específico, capazes de formar os dígitos de 0 a 9 através de combinações binárias.
+
+Cada segmento recebe um indentificador convencionado entre [A,B,C,D,E,F,G] e que é ativado individualmente com base em sinais de entrada. Dessa forma, o display atua como a camada final de saída do sistema.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{images/7-segment-display.png}
+    \caption{Display de 7 segmentos}
+    \label{fig:7-segment-display}	
+\end{figure}
+
+Dessa forma, é possível construir um display de 7 segmentos no Minecraft utilizando lampadas e fios dispostos de forma similar a convenção padrão.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/7-segment-display-redstone.png}
+    \caption{Display de 7 segmentos no Minecrat}
+    \label{fig:7-segment-display-redstone}
+\end{figure}
+
+\subsection{Decodificador BCD}
+
+No sistema, apesar de ser possível representar diretamente cada dígito do display de 7 segmentos como uma combinação de sinais individuais (segmentos A a G), essa abordagem é ineficiente. Isso ocorre porque seriam necessários 7 bits para codificar apenas 10 estados válidos (0 a 9), resultando em desperdício de representação.
+
+Para otimizar essa codificação, utiliza-se a representação em base binária. Com apenas 4 bits, é possível representar até 16 estados distintos ($2^4 = 16$), cobrindo com folga o intervalo necessário para os dígitos decimais.
+
+No entanto, os valores binários não são diretamente compatíveis com o display de 7 segmentos. Portanto, é necessário um mapeamento entre a representação binária (BCD) e os segmentos físicos do display.
+
+Esse mapeamento define quais segmentos devem ser ativados para cada número decimal.
+
+Por exemplo, para o número 0, os segmentos ativos são A, B, C, D, E e F, enquanto o segmento G e dp permanecem desativados:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.15\linewidth]{images/zero-7seg.png}
+    \caption{Representação do número 0 em um display de 7 segmentos.}
+    \label{fig:zero-7seg}
+\end{figure}
+
+A tabela abaixo representa a codificação do número 0 no formato de segmentos:
+
+\begin{center}
+\begin{tabular}{c|cccccccc}
+BCD & A & B & C & D & E & F & G & dp \\
+\hline
+0000 & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 \\
+\end{tabular}
+\end{center}
+
+Fazemos isso para os demais dígitos decimais, conforme apresentado na tabela completa abaixo:
+
+\begin{center}
+\begin{tabular}{c|cccccccc}
+BCD & A & B & C & D & E & F & G & dp \\
+\hline
+0000  & 1 & 1 & 1 & 1 & 1 & 1 & 0 & 0 \\
+0001  & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0010  & 1 & 1 & 0 & 1 & 1 & 0 & 1 & 0 \\
+0011  & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 0 \\
+0100  & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 \\
+0101  & 1 & 0 & 1 & 1 & 0 & 1 & 1 & 0 \\
+0110  & 1 & 0 & 1 & 1 & 1 & 1 & 1 & 0 \\
+0111  & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+1000  & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 0 \\
+1001  & 1 & 1 & 1 & 1 & 0 & 1 & 1 & 0 \\
+1010  & - & - & - & - & - & - & - & -\\
+1011  & - & - & - & - & - & - & - & -\\
+1100  & - & - & - & - & - & - & - & -\\
+1101  & - & - & - & - & - & - & - & -\\
+1110  & - & - & - & - & - & - & - & -\\
+1111  & - & - & - & - & - & - & - & -\\
+
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/numbers-7seg.png}
+    \caption{Representação do números 1-9 em um display de 7 segmentos.}
+    \label{fig:numbers-7seg}
+\end{figure}
+
+As combinações de 1010 a 1111 não representam dígitos válidos no sistema BCD, sendo tratadas como estados \textit{“don’t care”}, representados por "-" podendo assumir qualquer valor durante o processo de simplificação lógica.
+
+A partir dessa tabela-verdade, é possível derivar oito funções booleanas independentes, uma para cada segmento (A até G) e uma adicional para o ponto decimal (dp).
+
+Para isso, são utilizados 8 mapas de Karnaugh de 4 variáveis, permitindo a minimização das expressões booleanas associadas a cada uma das 8 saídas. Os quais, visto a extensão, foram disponibilizados separadamente, no github onde este trabahlo foi publicado (\url{https:url.com}).
+
+As funções resultantes descrevem o comportamento do decodificador BCD para display de 7 segmentos para todos os números de zero à nove.
+
+\begin{align*}
+A &= (\lnot N_{2} \land \lnot N_{0}) \lor N_{1} \lor (N_{2} \land N_{0}) \lor N_{3} \\[4pt]
+B &= (\lnot N_{2}) \lor (\lnot N_{1} \land \lnot N_{0}) \lor (N_{1} \land N_{0}) \\[4pt]
+C &= (\lnot N_{1}) \lor N_{0} \lor N_{2} \\[4pt]
+D &= (\lnot N_{2} \land \lnot N_{0}) \lor (\lnot N_{2} \land N_{1}) \lor
+(N_{2} \land \lnot N_{1} \land N_{0}) \lor (N_{1} \land \lnot N_{0}) \lor N_{3} \\[4pt]
+E &= (\lnot N_{2} \land \lnot N_{0}) \lor (N_{1} \land \lnot N_{0}) \\[4pt]
+F &= (\lnot N_{1} \land \lnot N_{0}) \lor (N_{2} \land \lnot N_{1}) \lor
+(N_{2} \land \lnot N_{0}) \lor N_{3} \\[4pt]
+G &= (\lnot N_{2} \land N_{1}) \lor (N_{2} \land \lnot N_{1}) \lor
+N_{3} \lor (N_{1} \land \lnot N_{0}) \\[4pt]
+dp &= 0
+\end{align*}
+
+Assim, montou-se o circuito do Decodificador BCD no Logisim: 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/BCD-decoder-circuit.png}
+    \caption{Circúito digital do decodificador BCD no Logisim Evolution}
+    \label{fig:BCD-decoder-circuit}
+\end{figure}
+
+Da mesma forma, traduziu-se o circúito para o Minecraft, diretamente ligado a uma unidade de display 7 segmentos: 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/nums-0-9-redstone7seg.jpg}
+    \caption{Números 0-9 no Decodificador BCD em redstone}
+    \label{fig:nums-0-9-redstone7seg}
+\end{figure}
+
+Este workflow, no qual idealizamos uma função, produzimos a tabela verdade, resolvemos os $n$ mapas de Karnough para cada uma das $n$ saídas, implementamos o circpuito no Logisim e depois no Minecraft tornará a aparecer diverssas vezes ao longo deste documento.
+
+\subsection{Clock}
+
+Embora o tempo físico seja contínuo, sistemas digitais operam a partir de amostragens discretas desse domínio. Nesse contexto, a evolução do sistema é modelada como uma sequência de estados indexados por instantes discretos $t \in \mathbb{N}$.
+
+Como descrito na seção \textbf{2.7}, o cronômetro, enquanto uma Máquina de Estados Finita (FSM), possui seu estado definido pela tupla $(H_t, M_t, S_t, D_t)$ no instante $t$.
+
+Para que essa modelagem discreta seja consistente com o comportamento físico do circuito, é necessário um mecanismo que determine de forma precisa quando as transições de estado devem ocorrer.
+
+O clock cumpre esse papel, atuando como uma referência temporal global que define os instantes de amostragem do sistema e sincroniza todos os seus componentes.
+
+O clock impõe uma ordem temporal ao sistema, evitando transições concorrentes e garantindo que a função de transição $\delta$ seja aplicada de forma determinística:
+
+\[
+S_t \xrightarrow{\delta} S_{t+1}
+\]
+
+sem ambiguidades causadas por atrasos de propagação nos componentes lógicos.
+
+Trata-se de um sinal periódico que alterna entre níveis lógicos alto (1) e baixo (0), estabelecendo uma estrutura temporal comum para o circuito. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/clock-waveform.png}
+    \caption{Onda de clock}
+    \label{fig:clock-waveform}
+\end{figure}
+
+\subsubsection{Propriedades do Clock}
+
+Formalmente, um sinal de clock pode ser modelado como uma função periódica discreta ou contínua no tempo. No contexto físico, considera-se inicialmente uma representação contínua:
+
+\[
+clk : \mathbb{R}_{\geq 0} \to \{0,1\}
+\]
+
+tal que:
+
+\[
+clk(t + T) = clk(t)
+\]
+
+onde \(T > 0\) representa o período do sinal.
+
+A frequência do clock é definida como o inverso do período:
+
+\[
+f = \frac{1}{T}
+\]
+
+Em sistemas digitais síncronos, o clock estabelece os instantes nos quais os elementos de memória amostram suas entradas e atualizam seus estados internos. Dessa forma, embora o sinal físico exista continuamente no tempo, a evolução lógica do sistema ocorre apenas em instantes discretos:
+
+\[
+t_n = nT, \quad n \in \mathbb{N}
+\]
+
+
+Assim, o período \(T\) pode ser decomposto em dois intervalos:
+
+\[
+T = t_{high} + t_{low}
+\]
+
+onde:
+
+\begin{itemize}
+    \item \(t_{high}\): duração do nível lógico alto;
+    \item \(t_{low}\): duração do nível lógico baixo.
+\end{itemize}
+
+A razão entre o tempo em nível alto e o período total define o \textit{duty cycle} $D$ do sinal:
+
+\[
+D = \frac{t_{high}}{T}
+\]
+
+Esse parâmetro é relevante em circuitos sensíveis à largura temporal dos pulsos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/duty-cycles.png}
+    \caption{Exemplos de duty cycle}
+    \label{fig:duty-cycles}
+\end{figure}
+
+Além disso, sendo um sinal periódico, o clock pode ser descrito por uma fase instantânea \(\theta(t)\), que representa sua posição relativa dentro de um ciclo.
+
+Matematicamente:
+
+\[
+\theta(t) = 2\pi \frac{t \bmod T}{T}
+\]
+
+com:
+
+\[
+\theta(t) \in [0, 2\pi)
+\]
+
+A fase fornece uma representação contínua da evolução temporal do sinal ao longo de um período.
+
+Embora sistemas digitais normalmente não utilizem diretamente o valor contínuo da fase, eventos específicos associados a ela possuem importância fundamental. Em particular:
+
+\begin{itemize}
+    \item \(\theta = 0\): borda de subida;
+    \item \(\theta = \pi\): borda de descida.
+\end{itemize}
+
+Essas transições definem os instantes nos quais máquinas de estado e elementos sequenciais realizam atualizações sincronizadas.
+
+A modelagem em termos de fase também é útil para a análise de fenômenos temporais como:
+
+\begin{itemize}
+    \item \textit{skew}: desalinhamento temporal do clock entre diferentes regiões do circuito;
+    \item \textit{jitter}: variações temporais na periodicidade do sinal.
+\end{itemize}
+
+Assim, um sinal de clock periódico pode ser caracterizado de forma compacta, pela tupla de parâmetros:
+
+\[
+(T, D, \theta_0)
+\]
+
+
+\subsubsection{Atraso de Propagação em Circuitos}
+
+Em circuitos digitais, as transições de sinal não ocorrem de forma instantânea. Cada componente lógico introduz um atraso entre a variação de sua entrada e a correspondente resposta na saída, conhecido como atraso de propagação ($t_p$).
+
+Como consequência, diferentes partes de um circuito podem observar valores distintos de um mesmo sinal em um dado instante, levando a inconsistências temporárias. Como será abordado adiante, em circuitos com realimentação, esses atrasos podem resultar em oscilações ou múltiplas transições indesejadas.
+
+O uso de um clock permite mitigar esses efeitos ao restringir as mudanças de estado a instantes discretos, nos quais se assume que os sinais já se estabilizaram.
+
+Considere um circuito combinacional que implementa uma função booleana $\delta : X \rightarrow Y$ de saída $y \in Y$ dada por:
+
+\[
+y(t) = f(x(t))
+\]
+
+Em circuitos físicos reais, entretanto, a saída não responde instantaneamente às variações da entrada. Considerando um atraso de propagação \(t_p\), o comportamento temporal pode ser aproximado por:
+
+\[
+y(t + t_p) = f(x(t))
+\]
+
+ou equivalentemente:
+
+\[
+y(t) = f(x(t - t_p))
+\]
+
+
+\subsubsection{Estrutura de um Clock Físico}
+
+Fisicamente, um sinal de clock é gerado por um oscilador e, apesar de extistírem diverssas formas de implementar um oscilador, tipicamente são baseados em cristal de quartzo ou circuitos eletrônicos ressonantes equivalentes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/Quartz Oscilator.png}
+    \caption{Oscilador de Quartzo}
+    \label{fig:Quartz Oscilator}
+	{\footnotesize Fonte: \url{https://analogcircuitdesign.com/the-quartz-crystal-oscillator/#quartz-crystal-passive-oscillator}}
+\end{figure}
+
+O cristal de quartzo é um cristal Piezoelétrico, em verdade, foi o primeiro cristal dessa categoria descoberto. Tais cristais, devido a sua estrutura molecular não centrocimétrica, isto é, com distribuição de cargas assimétricas, conduzem corrente quando deformados e são isolantes em estado de relaxamento. Dado um potencial inicial, o cristal deforma, conduz corrente e depois oscila em sua frequencia de ressonancia natural. \cite{Piezoelectricity Mould}
+
+Entretanto, com o decorrer do tempo, a energia do sistema é dispersa e as oscilações do circuito ressonante diminuem em amplitude até que parem completamente no equilíbrio. Por isso, além do oscilador ressonante, é necessário um sistema de feedback e amplificação do sinal, para que esta oscilação seja mantida. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/oscilador-amplificador-feedback.png}
+    \caption{Sistema de Feedback e Amplificação}
+    \label{fig:oscilador-amplificador-feedback}
+	{\footnotesize Fonte: \url{https://gacbe.ac.in/images/E%20books/Gonzales%20-%20Foundations%20of%20Oscillator%20Circuit%20Design%20%28Artech,%202007%29.pdf}}
+\end{figure}
+
+No Logisim, esse circuito de oscilador será representado por este componente, nativo do simulador e com clock personável no próximo sistema.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.2\linewidth]{images/clock-logisim.png}
+    \caption{Clock no Logisim Evolution}
+    \label{fig:clock-logisim}
+\end{figure}
+
+
+\subsubsection{Estrutura de um Clock de Redstone}
+
+No contexto do Minecraft, o clock é implementado por meio de circuitos de redstone que exploram atrasos discretos introduzidos por componentes como repetidores.
+
+Diferentemente de circuitos eletrônicos físicos, nos quais o tempo é contínuo e os atrasos são fenômenos analógicos, o tempo no jogo é explicitamente quantizado em \textit{ticks}, conforme definido anteriormente. Dessa forma, tanto a propagação de sinais quanto a atualização de estados ocorrem em múltiplos inteiros de Game Ticks (GT) ou Redstone Ticks (RT).
+
+Neste projeto, será utilizado um loop de repetidores de redstone que introduzem um atraso $\tau$ cada, em Redstone Ticks, de forma qual um pulso percorre continuamente um caminho fechado. 
+
+Como no jogo não existe dispersão de energia do sistema ressonante, o sinal permanece indefinidamente, produzindo uma oscilação periódica cujo período $T$ é determinado pela soma dos atrasos introduzidos ao longo do circuito. Dessa forma, para melhor controle do período, serão utilizados os repetidores do mod \textit{Wired Redstone}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/clock-redstone.png}
+    \caption{Clock no Minecraft}
+    \label{fig:clock-redstone}
+\end{figure}
+
+Esta implementação, entretanto, possúi um problema central: não é possível desativar e reativar as oscilações. Portanto, um dos repetidores será substituido por uma porta AND, a qual introduz atraso $\alpha$ RTs, que receberá um bit $A$, de tal forma que para $A = 0$ o ciclo será aberto, atuando como um controlador/transistor/amplificador do sistema.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/clock-redstone-controlado.png}
+    \caption{Clock no Minecraft com controle A}
+    \label{fig:clock-redstone-controlado}
+\end{figure}
+
+A retomada das oscilações requer a injeção de um pulso inicial no circuito. Esse pulso atua como uma perturbação que passa a circular no loop, estabelecendo o regime periódico.
+
+Para que o sistema opere corretamente, é necessário que exista apenas um único pulso propagando-se ao longo do circuito. Caso o pulso de ativação seja excessivamente longo, ele pode ocupar múltiplos estágios simultaneamente, resultando na formação de múltiplos pulsos no loop e, consequentemente, em comportamento incorreto do clock.
+
+Seja $w$ a largura do pulso de ativação. Para garantir a propagação de um único pulso, deve-se impor a seguinte condição:
+
+\[
+w < \min(\tau, \alpha)
+\]
+
+onde $\tau$ representa o atraso dos repetidores e $\alpha$ o atraso introduzido pela porta de controle.
+
+Essa restrição assegura que o pulso não se estenda por mais de um elemento do circuito ao mesmo tempo, preservando a integridade da oscilação periódica.
+
+
+\subsubsection{Detecção de Bordas}
+
+Em sistemas síncronos, as transições de estado ocorrem tipicamente nas bordas do sinal (subida ou descida), garantindo que todos os elementos de memória sejam atualizados de forma coordenada e evitando ambiguidades causadas por atrasos de propagação.
+
+O detector de borda de subida identifica o momento em que um sinal transita de 0 para 1, gerando um pulso curto. Se este sinal for o clock ($clk$):
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/rising-edge-detector-time-diagram.png}
+    \caption{Timing digital do detector de borda de subida}
+    \label{fig:rising-edge-detector-time-diagram}
+\end{figure}
+
+Esse comportamento pode ser descrito como:
+
+\[
+\text{Rising Edge} = clk \land \lnot clk_{delay}
+\]
+
+onde $clk_{delay}$ representa uma versão atrasada do sinal de clock, tal que $clk_{delay}(t) = clk(t - \Delta t)$.
+
+Segue uma implementação do circuito de detecção de borda de subida: 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/rising-edge-detector.png}
+    \caption{Detector de borda de subida}
+    \label{fig:rising-edge-detector}
+\end{figure}
+
+O portão not introduz o delay $\Delta t$ ao mesmo tempo que respeita a equação acima.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/falling-edge-detector-time-diagram.png}
+    \caption{Timing digital do detector de borda de descida}
+    \label{fig:falling-edge-detector-time-diagram}
+\end{figure}
+
+De forma análoga, o detector de borda de descida identifica a transição de 1 para 0:
+
+\[
+\text{Falling Edge} = \lnot clk \land clk_{delay}
+\]
+
+Uma implementação alternativa pode ser obtida a partir de uma transformação lógica utilizando as leis de De Morgan:
+
+\[
+\text{Falling Edge} = \lnot clk \land clk_{delay}
+= \lnot (clk \lor \lnot clk_{delay})
+\]
+
+Essa forma é particularmente útil do ponto de vista de implementação, pois permite construir o detector utilizando uma porta NOR em conjunto com um inversor.
+
+Nesse arranjo, o sinal $clk_{delay}$ é invertido e combinado com $clk$ por meio de uma porta NOR, produzindo diretamente o pulso correspondente à borda de descida.
+
+Nesse caso, o pulso de saída é gerado no instante em que o sinal original já transitou para nível baixo, enquanto sua versão atrasada ainda permanece em nível alto, caracterizando a borda de descida.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/falling-edge-detector.png}
+    \caption{Detector de borda de descida}
+    \label{fig:falling-edge-detector}
+\end{figure}
+
+
+\subsubsection{Considerações Práticas}
+
+Embora o modelo apresentado seja conceitualmente simples, sua implementação prática depende diretamente do controle preciso do atraso $\Delta t$.
+
+Para que o detector funcione corretamente, o atraso deve ser suficientemente pequeno para garantir que o pulso gerado seja curto, mas suficientemente grande para que exista uma diferença detectável entre $clk$ e $clk_{delay}$. Caso $\Delta t$ seja muito grande, o circuito pode gerar pulsos indesejados ou múltiplas ativações.
+
+Além disso, variações no atraso de propagação dos componentes podem introduzir incertezas temporais, afetando a precisão da detecção de borda. Em sistemas reais, esse fenômeno está relacionado ao \textit{jitter} e ao \textit{skew} do clock.
+
+Em ambientes discretos, como no Logisim ou em circuitos de Redstone, o atraso é quantizado, o que simplifica a análise, mas impõe limitações na resolução temporal do detector.
+
+Apesar dessas restrições, detectores de borda são amplamente utilizados como mecanismos fundamentais para sincronização, sendo responsáveis por converter transições de nível em eventos discretos que podem ser utilizados por máquinas de estado e circuitos sequenciais.
+
+Por exemplo, no Minecraft, para solucionar o problema do tamanho do pulso de retomada das oscilações, pode-se utilizar um detector de borda de subida no bit $A$. Dessa forma, quando ocorre uma transição $A_t = 0$ para $A_{t+1} = 1$. Tal pulso possui duração aproximadamente igual ao atraso $\Delta t$, garantindo que sua largura seja mínima e controlada, evitando a geração de múltiplos pulsos no circuito.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/toggle-redstone-clock.png}
+    \caption{Clock on/of de redstone}
+    \label{fig:toggle-redstone-clock}
+\end{figure}
+
+A título de curiosidade, existem tecnologias que exploram simultaneamente as bordas de subida e de descida do clock para realizar operações de leitura e escrita de dados. Essas tecnologias são conhecidas como \textit{Double Data Rate} (DDR).
+
+Em sistemas DDR, os dados são transferidos duas vezes por período de clock: uma vez na borda de subida e outra na borda de descida. Dessa forma, para uma mesma frequência de clock $f$, obtém-se uma taxa efetiva de transferência equivalente a $2f$.
+
+Essa abordagem permite aumentar o desempenho do sistema sem a necessidade de elevar a frequência do clock, o que é particularmente vantajoso devido às limitações físicas associadas a altas frequências, como maior consumo de energia, dissipação térmica e efeitos de propagação.
+
+
+\newpage
+
+\subsubsection{Setup Time e Hold Time}
+
+Para que elementos de memória, como flip-flops, que veremos na sessão \textbf{4.4}, operem corretamente, é necessário que suas entradas satisfaçam restrições temporais em relação ao sinal de clock.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/setup-hold-times.png}
+    \caption{Exemplo de setup e hold times para um Flip Flop tipo D}
+    \label{fig:setup-hold-times}
+\end{figure}
+
+O \textit{setup time} ($t_{setup}$) é o intervalo mínimo antes da borda ativa do clock durante o qual a entrada deve permanecer estável.
+
+O \textit{hold time} ($t_{hold}$) é o intervalo mínimo após a borda do clock durante o qual a entrada deve continuar estável.
+
+Formalmente, se $t_0$ representa o instante da borda do clock, a entrada deve permanecer inalterada no intervalo:
+
+\[
+[t_0 - t_{setup},\ t_0 + t_{hold}]
+\]
+
+A violação dessas restrições pode levar a comportamentos incorretos.
+
+\newpage
+
+\subsection{Memória}
+
+As restrições de \textit{setup} e \textit{hold} evidenciam um aspecto fundamental dos sistemas síncronos: não basta definir apenas os instantes de atualização por meio do clock, mas também garantir que os dados estejam estáveis nesses instantes.
+
+Isso levanta uma questão central: como armazenar e preservar valores lógicos de forma consistente entre diferentes ciclos de clock?
+
+Para isso, são necessários componentes capazes de reter informação ao longo do tempo, mesmo na ausência de mudanças nas entradas. Esses componentes são conhecidos como elementos de memória.
+
+\subsubsection{Latch SR}
+
+O latch SR (Set-Reset) é o elemento de memória mais simples, composto por duas portas lógicas interligadas por realimentação.
+
+Ele possui duas entradas principais:
+\begin{itemize}
+    \item $S$ (Set): força a saída para 1
+    \item $R$ (Reset): força a saída para 0
+\end{itemize}
+
+Seu comportamento pode ser descrito pela seguinte tabela de transição de estados:
+
+\begin{center}
+\begin{tabular}{c c | c}
+S & R & $Q_{t+1}$ \\
+\hline
+0 & 0 & $Q_t$ \\
+0 & 1 & 0 \\
+1 & 0 & 1 \\
+1 & 1 & indefinido
+\end{tabular}
+\end{center}
+
+onde $Q_t$ representa o estado atual e $Q_{t+1}$ o próximo estado do sistema.
+
+Observa-se que, na ausência de estímulos ($S = R = 0$), o circuito preserva seu estado anterior. Essa propriedade de retenção de informação caracteriza um elemento de memória.
+
+Existem duas implementações clássicas do latch SR, baseadas em portas NOR e NAND:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/sr-latch-circuit.png}
+    \caption{Implementações do latch SR com portas NOR e NAND}
+    \label{fig:sr-latch-circuit}
+\end{figure}
+
+Neste trabalho, será utilizada a implementação com portas NOR.
+
+Utilizando redstone, é possível construir um latch SR equivalente:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/sr-nor-latch-redstone.png}
+    \caption{Latch SR implementado no Minecraft}
+    \label{fig:sr-nor-latch-redstone}
+\end{figure}
+
+A condição $S = R = 1$ é considerada inválida pois força simultaneamente as duas saídas do circuito, violando a relação complementar entre $Q$ e $\lnot Q$. Em circuitos reais, isso pode levar a um estado indeterminado ou metaestável, no qual o valor final não é previsível.
+
+Pode-se adicionar um controle de clock a partir de duas portas AND, recebendo as entradas $S$ e $R$ e o pulso de clock.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/sr-nor-latch-redstone-clock.png}
+    \caption{Latch SR implementado no Minecraft com controle de clock}
+    \label{fig:sr-nor-latch-redstone-clock}
+\end{figure}
+
+
+\subsubsection{Flip-Flop JK}
+
+O flip-flop JK é uma evolução do latch SR que resolve o estado inválido.
+
+Entradas:
+\begin{itemize}
+    \item $J$ (Set)
+    \item $K$ (Reset)
+\end{itemize}
+
+Tabela de transição:
+
+\begin{center}
+\begin{tabular}{c c | c}
+J & K & $Q_{t+1}$ \\
+\hline
+0 & 0 & $Q_t$ \\
+0 & 1 & 0 \\
+1 & 0 & 1 \\
+1 & 1 & $\overline{Q_t}$
+\end{tabular}
+\end{center}
+
+A pode ser feita da seguite forma: 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/JK-FF-circuit.png}
+    \caption{Implementação do Flip Flop JK a partir do SR Nor Latch no Logisim Evolution}
+    \label{fig:JK-FF-circuit}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/JK-FF-redstone.png}
+    \caption{Implementação do Flip Flop JK a partir do SR Nor Latch no Minecraft}
+    \label{fig:JK-FF-redstone}
+\end{figure}
+
+O estado $Q$ é atualizado apenas durante o nível ativo do sinal de clock. No entanto, quando $J = K = 1$, o circuito tende a alternar continuamente entre $Q$ e $\lnot Q$ devido à realimentação interna.
+
+Para evitar esse comportamento, é necessário que a duração do pulso de clock ($t_{high}$) seja menor que o tempo total de propagação do circuito ($t_{loop}$):
+
+\[
+t_{high} < t_{loop}
+\]
+
+Nesse contexto, detectores de borda podem ser utilizados para transformar o sinal de clock em pulsos extremamente curtos, associados apenas às transições do sinal.
+
+Dessa forma, garante-se que apenas uma transição de estado ocorra por pulso de clock, evitando múltiplas comutações indesejadas.
+
+Esse problema é conhecido como \textit{race-around condition} e ocorre em implementações sensíveis ao nível do clock.
+
+
+\subsubsection{Flip-Flop D}
+
+O flip-flop D (Data) é o mais utilizado em sistemas digitais reais devido à sua simplicidade. Ele possui apenas uma entrada:
+
+\begin{itemize}
+    \item $D$: Data
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{c | c}
+D & $Q_{t+1}$ \\
+\hline
+ 0 & 0 \\
+ 1 & 1 \\
+\end{tabular}
+\end{center}
+
+Ou seja, em $t+1$ o circúito assume o estado D.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/D-FF.png}
+    \caption{Implementação do Flip Flop tipo D a partir do Flip Flop JK}
+    \label{fig:D-FF}
+\end{figure}
+
+Apesar de ser possível fazer esta implementação no Minecraft,
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/D-FF-redstone-expanded.png}
+    \caption{Implementação do Flip Flop tipo D a partir do Flip Flop JK em redstone}
+    \label{fig:D-FF-redstone-expanded}
+\end{figure}
+
+tipicamente, aproveita-se da propiedade de trava dos repetidores de redstone para implementar o Flip Flop tipo D, na seguinte disposição:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/D-FF-redstone.png}
+    \caption{Implementação do Flip Flop tipo D a partir de repetidores de redstone}
+    \label{fig:D-FF-redstone}
+\end{figure}
+
+De forma simplificada, enquanto $clk=0$ o repetidor trava no estado $Q$, quando o sinal de clock sobe, o repetidor é destravado e o estado de D é liberado para passar por ele. Assim, quando o clock desce, o repetidor trava no estado de $D$.
+
+Entretanto, existe um atraso entre o clock e o lock efetivo do sistema. Observe o diagrama temporal desse sistema. No exemplo considerado, o clock possui período de $10$ Game Ticks e duty cycle de $50\%$. O repetidor está configurado para $1$ RT, e o portão NOT introduz um atraso de $1$ GT.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/D-FF-time-diagram-redstone.png}
+    \caption{Diagrama temporal do flip flpo tipo D descrito}
+    \label{fig:D-FF-time-diagram-redstone}
+\end{figure}
+
+O instante efetivo de captura do valor de $D$ ocorre imediatamente antes do travamento do circuito. Considerando o atraso total até o bloqueio ($t_{lock}$) e o atraso interno do repetidor ($t_{rep}$), o valor armazenado corresponde ao sinal de entrada no instante:
+
+\begin{align*}
+t &= t_{lock} - t_{rep}
+\end{align*}
+
+O instante de travamento pode ser expresso em função do clock como:
+
+\begin{align*}
+t_{lock} &= ( t_{descida}) + t_{delay} \\
+&=( t_{subida} + T \cdot \text{duty cycle}) + t_{delay}
+\end{align*}
+
+Portanto, 
+
+\begin{align*}
+t &= ( t_{descida}) + t_{delay} - t_{rep} \\
+&= ( t_{subida} + T \cdot \text{duty cycle}) + t_{delay} - t_{rep}
+\end{align*}
+
+onde $t_{delay}$ representa o atraso acumulado dos componentes do circuito. 
+
+Substituindo, as variáveis para este exemplo, obtemos:
+
+\begin{align*}
+t &= t_{descida} + 1 \\
+&= t_{subida} + 6
+\end{align*}
+
+Observa-se, portanto, que o instante de amostragem não coincide exatamente com a borda do clock, sendo deslocado pelos atrasos de propagação do circuito.
+
+\subsubsection{Flip-Flop T}
+
+O flip-flop T (\textit{Toggle}) é um elemento elemento de memória especializado na alternância de estado. Ele é amplamente utilizado na construção de contadores e divisores de frequência.
+
+Entrada:
+\begin{itemize}
+    \item $T$ : Toggle
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{c | c}
+T & $Q_{t+1}$ \\
+\hline
+0 & $Q_t$ \\
+1 & $\overline{Q_t}$
+\end{tabular}
+\end{center}
+
+Ou seja, quando $T = 1$, o estado é invertido a cada borda ativa do clock. Quando $T = 0$, o estado é mantido.
+
+Esse comportamento pode ser expresso de forma compacta como:
+
+\[
+Q_{t+1} = T \oplus Q_t
+\]
+
+Uma forma comum de implementação do flip-flop T é a partir de um flip-flop JK, conectando-se as entradas $J$ e $K$ ao sinal $T$:
+
+\[
+J = K = T
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/T-FF-circuit.png}
+    \caption{Implementação do Flip Flop tipo T a partir do Flip Flop JK em redstone}
+    \label{fig:T-FF-circuit}
+\end{figure}
+
+Nesse arranjo, quando $T = 1$, o circuito entra no modo de alternância, enquanto $T = 0$ preserva o estado atual.
+
+Uma aplicação fundamental do flip-flop T é como divisor de frequência. Quando $T = 1$ constantemente, o sinal de saída $Q$ alterna a cada ciclo de clock, resultando em uma frequência de saída igual à metade da frequência de entrada:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/T-FF-freq-half.png}
+    \caption{Diagrama Temporal de Q por clock com $T=1$}
+    \label{fig:T-FF-freq-half}
+\end{figure}
+
+\[
+f_{out} = \frac{f_{clk}}{2}
+\]
+
+Além disso, esse comportamento permite a construção de contadores binários, que serão abordados na sessão \textbf{4.5}.
+
+
+\subsubsection{Considerações sobre o Logisim Evolution}
+
+Haja vista a importância desses elementos de memória, o Logisim Evolution possui implementações prontas em circúitos integrados, as quais serão utilizadas a partir deste ponto no documento:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.2\linewidth]{images/FF-logisim.png}
+    \caption{Flip Flops no Logisim Evolution}
+    \label{fig:FF-logisim}
+\end{figure}
+
+Note que nesses flip flops exitem duas entradas e uma saída extras respectivamente $S, R$ e $\lnot Q$ (saída abaixo de $Q$ com circulo representando NOT).
+
+\begin{itemize}
+    \item $S_t = 1 \rightarrow Q_t = 1$, mesmo que sem pulso de clock 
+    \item $R_t = 1 \rightarrow Q_t = 0$, mesmo que sem pulso de clock
+    \item $S_t = R_t = 1 \rightarrow Q_t = 0$ 
+\end{itemize}
+
+Além disso, a entrada do clock é representada por: 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{images/clk-in-logisim.png}
+    \caption{Representações de entrada de clock no Logisim Evolution}
+    \label{fig:clk-in-logisim}
+\end{figure}
+
+
+\subsubsection{Registradores}
+
+Registradores são estruturas de memória compostas por múltiplos flip-flops.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/D-Reg-4bit.png}
+    \caption{Registrador de 4 bits Utilizando flip flops tipo D}
+    \label{fig:D-Reg-4bit}
+\end{figure}
+
+Um registrador de $n$ bits armazena um estado $Q$ em um vetor:
+
+\[
+Q = (Q_0, Q_1, ..., Q_{n-1})
+\]
+
+De tal forma que todos os bits $Q_i \forall i \in [0, n-1]$ são atualizados simultaneamente no pulso de clock.
+
+Esse será um componente fundamental para este projeto, visto que o estado $S$ do cronômetro, definido pela tupla $(H_t, M_t, S_t, D_t)$  será armazenado em registradores a base de flip flops tipo D.
+
+
+\newpage
+
+\section{Contadores}
+
+Contadores são circuitos sequenciais especializados na geração de sequências determinísticas de estados ao longo do tempo, sendo amplamente utilizados em sistemas digitais para medição, temporização e controle.
+
+Formalmente, podem ser interpretados como máquinas de estados finitas (FSMs), caracterizadas pela quíntupla $(Q, \Sigma, \delta, q_0, F)$, onde $Q$ é um conjunto finito de estados e $\delta$ define a transição entre esses estados.
+
+No caso de contadores síncronos autônomos, a transição de estados depende exclusivamente do sinal de clock, podendo ser modelada como:
+
+\[
+\delta: Q \rightarrow Q
+\]
+
+De forma mais específica, muitos contadores seguem uma dinâmica baseada em aritmética modular:
+
+\[
+Q_{t+1} = (Q_t + \Delta) \bmod n
+\]
+
+onde $\Delta$ representa o incremento (ou decremento) aplicado ao estado atual, e $n$ representa o número total de estados válidos do sistema.
+
+Essa estrutura descreve naturalmente o comportamento cíclico dos contadores digitais, nos quais, após atingir um estado máximo, o sistema retorna ao estado inicial.
+
+Por exemplo, um contador MOD 60 percorre ciclicamente os estados:
+
+\[
+0 \rightarrow 1 \rightarrow 2 \rightarrow \dots \rightarrow 59 \rightarrow 0
+\]
+
+Esse tipo de estrutura é fundamental na construção de cronômetros digitais, nos quais múltiplos contadores modulares são combinados para representar unidades de tempo como segundos, minutos e horas.
+
+
+\subsection{Categorização de Contadores por Congruência Modular}
+
+\subsection{Contadores Assíncronos}
+
+\subsection{Contadores Síncronos}
+
+\subsection{Carry e Borrow}
+
+\subsection{Arquiteturas de Implementação}
+
+\subsubsection{Baseados em Flip-Flops T}
+
+\subsubsection{Jhonson Ring Counters}
+\subsubsection{Baseados em Somadores (Adder Based)}
+
+\subsubsection{Baseados em BCD}
+
+\subsubsection{Baseados em Representação Binária}
+
+\subsubsection{Implementações com Um Registrador}
+
+\subsubsection{Implementações com Dois Registradores}
+
+\subsection {Neste Projeto}
+
+\subsubsection{Contador Síncrono MOD 60}
+
+\subsubsection{Contador Síncrono MOD 6}
+
+\paragraph{Incremento}
+
+A operação de incremento realiza a transição:
+\[
+D \mapsto (D + 1) \mod 6
+\]
+
+
+A Tabela abaixo descreve o comportamento completo da função de incremento:
+
+\begin{center}
+\begin{tabular}{c|cccc}
+$D$ & $O_2$ & $O_1$ & $O_0$ & $Carry$\\
+\hline
+$000$ & $0$ & $0$ & $1$ & $0$\\
+$001$ & $0$ & $1$ & $0$ & $0$\\
+$010$ & $0$ & $1$ & $1$ & $0$\\
+$011$ & $1$ & $0$ & $0$ & $0$\\
+$100$ & $1$ & $0$ & $1$ & $0$\\
+$101$ & $0$ & $0$ & $0$ & $1$\\
+$110$ & $0$ & $0$ & $0$ & $0$\\
+$111$ & $0$ & $0$ & $0$ & $0$\\
+\end{tabular}
+\end{center}
+
+A partir da tabela verdade, e utilizando mapas de Karnaugh, obtêm-se as seguintes expressões booleanas:
+
+\begin{align*}
+O_2 &= (\lnot D_2 \land D_1 \land D_0)\ \lor\ (D_2 \land \lnot D_1 \land \lnot D_0) \\
+O_1 &= (\lnot D_2 \land \lnot D_1 \land D_0)\ \lor\ (\lnot D_2 \land D_1 \land \lnot D_0) \\
+O_0 &= (\lnot D_2 \land \lnot D_0)\ \lor\ (\lnot D_1 \land \lnot D_0) \\
+Carry &= D_2 \land \lnot D_1 \land D_0
+\end{align*}
+
+O sinal $Carry$ indica a ocorrência de overflow, isto é, a transição de $101$ para $000$.
+
+As Figuras~\ref{fig:incmod6} e~\ref{fig:incmod6-red} apresentam, respectivamente, a implementação lógica do circuito e sua realização em redstone.
+
+\paragraph{Decremento}
+
+A operação de decremento realiza a transição:
+\[
+D \mapsto (D - 1) \mod 6
+\]
+
+A tabela correspondente é:
+
+\begin{center}
+\begin{tabular}{c|cccc}
+$D$ & $O_2$ & $O_1$ & $O_0$ & $Carry$\\
+\hline
+$000$ & $1$ & $0$ & $1$ & $1$\\
+$001$ & $0$ & $0$ & $0$ & $0$\\
+$010$ & $0$ & $0$ & $1$ & $0$\\
+$011$ & $0$ & $1$ & $0$ & $0$\\
+$100$ & $0$ & $1$ & $1$ & $0$\\
+$101$ & $1$ & $0$ & $0$ & $0$\\
+$110$ & $0$ & $0$ & $1$ & $0$\\
+$111$ & $1$ & $1$ & $0$ & $0$\\
+\end{tabular}
+\end{center}
+
+As expressões booleanas minimizadas são:
+
+\begin{align*}
+O_2 &= (\lnot D_2 \land \lnot D_1 \land \lnot D_0)\ \lor\ (D_2 \land D_0) \\
+O_1 &= (D_1 \land D_0)\ \lor\ (D_2 \land \lnot D_1 \land \lnot D_0) \\
+O_0 &= \lnot D_0 \\
+Carry &= \lnot D_2 \land \lnot D_1 \land \lnot D_0
+\end{align*}
+
+Neste caso, o sinal $Carry$ indica underflow, ou seja, a transição de $000$ para $101$.
+
+As Figuras~\ref{fig:decmod6} e~\ref{fig:decmod6-red} mostram a implementação lógica e sua versão em redstone.
+
+\paragraph{Considerações de Projeto}
+
+Embora funcional, o contador apresentado não é autocorretivo, pois estados inválidos não são redirecionados explicitamente para o ciclo válido. Em aplicações físicas sujeitas a ruído ou falhas transitórias, isso pode levar a comportamentos inesperados.
+
+Uma alternativa mais robusta consiste em tratar os estados inválidos como condições de correção, forçando a transição para um estado válido (tipicamente $000$), ou utilizando tais estados como \textit{don't care} durante a minimização lógica para otimizar o circuito.
+
+\subsubsection{Contador Síncrono MOD 10}
+
+\subsubsection{Contador Síncrono MOD 24}
+
+\newpage
+
+\section{Integração do Sistema}
+
+\subsection{Arquitetura Geral}
+\subsection{Layout dos Displays}
+\subsection{Decodificadores BCD e Registradores}
+\subsection{Contadores e Multiplexadores}
+\subsection{Reset e Clock}
+\subsection{Encadeamento}
+
+\newpage
+
+\section{Conclusão}
+
+O desenvolvimento deste projeto permitiu a consolidação de conceitos essenciais da eletrônica digital, desde a simplificação de funções booleanas via Mapas de Karnaugh até a implementação de máquinas de estados finitos.
+
+A restrição ao uso de componentes básicos forçou a compreensão da lógica interna de cada subcircuito, como o uso de multiplexadores para alternar entre incremento e decremento e o encadeamento de sinais de \textit{carry} e \textit{borrow} para a contagem em cascata.
+
+A prototipagem no Minecraft demonstrou-se uma ferramenta pedagógica poderosa, revelando desafios reais de propagação de sinais e sincronização, frequentemente omitidos em simuladores puramente teóricos.
+
+O uso de flip-flops tipo D para memória e registradores confirmou a viabilidade de construir sistemas sequenciais complexos a partir de elementos discretos.
+
+Em suma, o trabalho evidencia que a arquitetura modular e a análise rigorosa das transições de estado são fundamentais para o sucesso de sistemas digitais, independentemente do meio físico de implementação.
+
+\newpage
+
+\section{Referências}
+
+\begin{thebibliography}{9}
+
+\bibitem{Logisim}
+Logisim Evolution. Disponível em: \url{https://github.com/logisim-evolution/logisim-evolution}
+
+\bibitem{Minecraft}
+Minecraft Wiki. Redstone. Disponível em: \url{https://minecraft.wiki}
+
+\bibitem{Piezoelectricity Mould}
+Mould, Steve. Piezoelectricity - why hitting crystals makes electricity Disponível em \url{https://youtu.be/wcJXA8IqYl8}
+
+\bibitem{Quartz Watch Mould}
+Mould, Steve. How a quartz watch works - its heart beats 32,768 times a second Disponível em \url{https://youtu.be/wcJXA8IqYl8}
+
+\bibitem{Transistor}
+Lee, Chuan-Zheng. Transistors, Stanford University Disponível em \url{https://web.stanford.edu/class/archive/engr/engr40m.1178/slides/transistors.pdf}
+
+
+\end{thebibliography}
+
+\end{document}
