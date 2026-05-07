@@ -1,72 +1,32 @@
 \subsection{Máquina de Estados Finita}
 
-Uma máquina de estados é um modelo matemático utilizado para descrever sistemas que evoluem ao longo do tempo de acordo com entradas e estados internos. Em termos de circuitos digitais, ela representa formalmente sistemas sequenciais, nos quais a saída depende não apenas das entradas atuais, mas também do estado armazenado previamente em memória.
+Uma máquina de estados é um modelo matemático utilizado para descrever sistemas cujo comportamento evolui ao longo do tempo em função de entradas externas e de um estado interno previamente armazenado.
 
-Uma Máquina de Estados Finita (FSM - Finite State Machine) é um modelo no qual o número de estados possíveis é limitado. Cada estado representa uma configuração discreta do sistema, e as transições entre estados são definidas por regras lógicas baseadas nas entradas e no estado atual.
+Em circuitos digitais, esse modelo é fundamental para a descrição de sistemas sequenciais, nos quais a saída não depende apenas do valor atual das entradas, mas também do histórico do sistema, representado pelo seu estado interno. Dessa forma, a memória do sistema desempenha um papel essencial em sua dinâmica.
 
-Formalmente, uma FSM pode ser descrita por uma quíntupla:
+Uma Máquina de Estados Finita (FSM - \textit{Finite State Machine}) é uma classe específica de máquina de estados na qual o conjunto de estados possíveis é finito e bem definido. Cada estado representa uma configuração discreta do sistema em um dado instante, e a evolução entre estados ocorre de maneira determinística, conforme regras de transição.
+
+De forma intuitiva, uma FSM pode ser entendida como um sistema que:
+\begin{itemize}
+    \item observa uma entrada (ou ausência dela),
+    \item consulta seu estado atual,
+    \item e então determina o próximo estado com base em uma regra fixa.
+\end{itemize}
+
+Esse comportamento pode ser formalizado por uma quíntupla:
 
 \[
 FSM = (Q, \Sigma, \delta, q_0, F)
 \]
 
 onde:
+
 \begin{itemize}
-    \item $Q$ é o conjunto finito de estados
-    \item $\Sigma$ é o conjunto de entradas
-    \item $\delta$ é a função de transição de estados
-    \item $q_0$ é o estado inicial
-    \item $F$ é o conjunto de estados finais (opcional em sistemas cíclicos)
+    \item $Q$ é o conjunto finito de estados possíveis do sistema;
+    \item $\Sigma$ é o conjunto de símbolos de entrada (alfabeto de entrada);
+    \item $\delta : Q \times \Sigma \rightarrow Q$ é a função de transição de estados, que define como o sistema evolui de um estado para outro;
+    \item $q_0 \in Q$ é o estado inicial, que define a configuração de partida do sistema;
+    \item $F \subseteq Q$ é o conjunto de estados finais ou de aceitação (em sistemas cíclicos, como contadores, este conjunto pode ser vazio ou implícito).
 \end{itemize}
 
-\subsubsection{Cronômetro como Máquina de Estados}
-
-No contexto deste projeto, o cronômetro pode ser modelado como uma máquina de estados finita composta por três subsistemas sequenciais encadeados, representando segundos, minutos e horas.
-
-Cada estado global do sistema pode ser definido como uma tupla:
-
-\[
-\mathcal{S} = (H, M, S, D)
-\]
-
-onde:
-
-\begin{align*}
-H &\in [0, 23] \quad \text{representa as horas} \\
-M &\in [0, 59] \quad \text{representa os minutos} \\
-S &\in [0, 59] \quad \text{representa os segundos} \\
-D &\in \{0,1\} \quad \text{representa a direção (0 = crescente, 1 = decrescente)}
-\end{align*}
-
-Como será detalhado posteriormente, os elementos $M$ e $S$ são implementados internamente como pares de dígitos decimais, divididos em dezena e unidade, tais que:
-
-\[
-M = (M_{dezena}, M_{unidade}), \quad S = (S_{dezena}, S_{unidade})
-\]
-
-com:
-
-\[
-M_{dezena}, S_{dezena} \in [0,5], \quad
-M_{unidade}, S_{unidade} \in [0,9]
-\]
-
-O conjunto de estados válidos do sistema é, portanto, finito e dado por:
-
-\[
-|\mathcal{S}| = 24 \cdot 60 \cdot 60 \cdot 2
-\]
-
-Seja  $S_t$  o estado global do sistema em determinado momento $t$, a função de transição de estados pode ser descrita genericamente por:
-
-\[
-\delta(\mathcal{S}_t) = \mathcal{S}_{t+1}
-\]
-
-ou, de forma expandida:
-
-\[
-\delta(H_t, M_t, S_t, D_t) = (H_{t+1}, M_{t+1}, S_{t+1}, D_{t+1})
-\]
-
-Retornaremos a esta definição mais à frente no documento.
+Em sistemas digitais sequenciais, como contadores, registradores e controladores, a FSM frequentemente opera de forma cíclica, isto é, após um conjunto de transições, o sistema retorna a estados previamente visitados, formando um ciclo contínuo de execução.

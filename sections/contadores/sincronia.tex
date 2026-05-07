@@ -2,7 +2,7 @@
 
 Os contadores síncronos são aqueles em que todas as mudanças de estado ocorrem simultaneamente, ou seja, todos os flip-flops são acionados pelo mesmo sinal de clock. 
 
-\begin{figure}[htbp]
+\begin{figure}[H]
    	\centering
    	\includegraphics[width=0.7\linewidth]{images/sincrono-time-diagram.png}
   	 \caption{Diagrama de tempo de um contador síncrono}
@@ -11,7 +11,7 @@ Os contadores síncronos são aqueles em que todas as mudanças de estado ocorre
 
 Já os contadores assíncronos, também conhecidos como contadores ripple, têm seus flip-flops acionados em cascata, o que pode levar a atrasos na propagação do sinal.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
    	\centering
    	\includegraphics[width=0.7\linewidth]{images/assincrono-time-diagram.png}
   	 \caption{Diagrama de tempo de um contador assíncrono}
@@ -23,18 +23,18 @@ Mesmo assim, eles são preferidos em aplicações que exigem alta velocidade e p
 
 Tipicamente, contadores assíncronos são implementados utilizando flip-flops JK ou D em cascata seguindo o seguinte modelo:
 
-\begin{figure}[htbp]
+\begin{figure}[H]
    	\centering
-   	\includegraphics[width=0.2\linewidth]{images/assincrono-circuit.png}
+   	\includegraphics[width=0.14\linewidth]{images/assincrono-circuit.png}
   	 \caption{Circuito de um contador assíncrono}
    	\label{fig:assincrono-circuit}
 \end{figure}
 
 Enquanto os contadores síncronos costumam ser modelados como FSMs, com funções de transição $\delta$ de estado bem definidas:
 
-\begin{figure}[htbp]
+\begin{figure}[H]
    	\centering
-   	\includegraphics[width=0.4\linewidth]{images/sincrono-circuit.png}
+   	\includegraphics[width=0.31\linewidth]{images/sincrono-circuit.png}
   	 \caption{Circuito de um contador síncrono}
    	\label{fig:sincrono-circuit}
 \end{figure}
