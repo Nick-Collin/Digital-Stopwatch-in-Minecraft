@@ -1,9 +1,7 @@
 latexmk -pdf -output-directory=build main.tex
 
-# abre workspace
+Copy-Item build/main.pdf main.pdf -Force
+
 code -r .
-
 Start-Sleep -Milliseconds 500
-
-# abre o pdf
-code -r build/main.pdf
+code -r main.pdf
