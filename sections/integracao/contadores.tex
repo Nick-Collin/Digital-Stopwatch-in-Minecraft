@@ -1,0 +1,18 @@
+\subsection{Implementação dos Contadores}
+
+Nesta etapa, as funções de transição mais básicas são concretizadas em contadores síncronos modulares: $mod6$, $mod10$ e $mod24$.
+
+Cada contador é definido por uma tabela verdade derivada diretamente de sua transição de estados, sendo posteriormente simplificada por mapas de Karnaugh.
+
+O sinal \textit{Carry} é empregado para indicar a ocorrência de overflow (no incremento) ou underflow (no decremento), dependendo da operação considerada.
+
+A partir desse procedimento, a aplicação aos diferentes módulos segue de forma sistemática, variando apenas os domínios de cada contador.
+
+\input{sections/integracao/contadores/mod6}
+\input{sections/integracao/contadores/mod10}
+\input{sections/integracao/contadores/mod24}
+
+\subsubsection{Considerações de Projeto}
+
+Note que, embora funcional, o contador apresentado não é autocorretivo, pois estados inválidos não são mapeados explicitamente para estados válidos. Isso implica que o sistema não garante convergência para o conjunto de estados válidos a partir de estados inválidos. Em aplicações reais, isso pode levar a comportamentos inesperados.
+

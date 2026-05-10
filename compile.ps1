@@ -1,6 +1,7 @@
 latexmk -pdf -output-directory=build main.tex
 
-Copy-Item build/main.pdf main.pdf -Force
+cp arquivo destino
+sleep 1
 
 code -r .
 Start-Sleep -Milliseconds 500

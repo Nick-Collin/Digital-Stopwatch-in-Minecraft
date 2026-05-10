@@ -1,0 +1,65 @@
+\subsubsection{Estrutura interna do estado}
+
+Existem duas principais formas de representar o estado interno do sistema: \textbf{representação binária direta} e \textbf{representação decimal codificada (BCD)}. 
+Ambas apresentam diferentes compromissos entre eficiência de informação e simplicidade de implementação.
+
+Como demonstrado anteriormente, o sistema possui $172800$ estados possíveis, o que requer um número mínimo de bits dado por:
+
+\begin{align*}
+n &= \left\lceil \log_2(24 \times 60 \times 60 \times 2) \right\rceil = 18
+\end{align*}
+
+Na representação binária direta, o estado pode ser armazenado em um registrador de 18 bits. No entanto, a função de transição associada a esse modelo envolve a manipulação de um espaço de estados de alta dimensionalidade. Mesmo com o uso de técnicas de otimização combinacional, a complexidade dessa função dificulta sua decomposição em blocos menores e independentes.
+
+Por outro lado, a representação BCD permite explorar a estrutura modular do problema. Cada dígito (horas, minutos e segundos) pode ser tratado como um contador independente, simplificando significativamente a lógica de transição.
+
+Considerando os intervalos específicos de cada componente:
+
+\[
+H = (H_d, H_u), \quad M = (M_d, M_u), \quad S = (S_d, S_u)
+\]
+
+com:
+
+\begin{align*}
+H_d \in [0,2], \quad H_u \in [0,9], \quad M_d, S_d \in [0,5], \quad M_u, S_u \in [0,9]\\
+\end{align*}
+
+sob as condições deste projeto, é possível utilizar uma codificação decimal restrita, na qual apenas os valores válidos são representados. Dessa forma, reduz-se o número total de bits necessários para representar o estado.
+
+\begin{align*}
+    |H_d| &= 3 \Rightarrow n_{H_d} = \lceil \log_2 3 \rceil = 2 \\
+    |H_u| &= 10 \Rightarrow n_{H_u} = \lceil \log_2 10 \rceil = 4 \\
+    |M_d| &= 6 \Rightarrow n_{M_d} = \lceil \log_2 6 \rceil = 3 \\
+    |M_u| &= 10 \Rightarrow n_{M_u} = \lceil \log_2 10 \rceil = 4 \\
+    |S_d| &= 6 \Rightarrow n_{S_d} = \lceil \log_2 6 \rceil = 3 \\
+    |S_u| &= 10 \Rightarrow n_{S_u} = \lceil \log_2 10 \rceil = 4
+\end{align*}
+
+\begin{align*}
+    N &= \Sigma n = 2 + 4 + 3 + 4 + 3 + 4 = 20
+\end{align*}
+
+O vetor de estado pode, portanto, ser interpretado como uma concatenação de subregiões dedicadas a cada dígito.
+
+Desse modo, a função de transição $\delta$ pode ser estruturada como um conjunto de subfunções independentes associadas a cada componente do estado, isto é, horas, minutos e segundos. Essa decomposição explora a estrutura hierárquica do sistema, reduzindo o acoplamento entre variáveis globais e permitindo que cada submódulo opere sobre um subconjunto restrito de bits.
+
+Como consequência, a complexidade da implementação não é dominada pela cardinalidade do espaço global de estados, mas sim pela complexidade local de cada unidade de atualização e pelas condições de propagação entre dígitos (carry/borrow).
+
+A escolha dessa decomposição também é influenciada pelas restrições de implementação adotadas, em particular a utilização de uma abordagem síncrona sem o uso de operadores aritméticos explícitos. Nesse contexto, a estrutura modular baseada em dígitos permite a realização das funções de transição por meio de lógica combinacional local, evitando a necessidade de unidades aritméticas globais.
+
+Por fim, neste projeto, a implementação das horas difere daquela dos minutos e segundos por uma questão estrutural do domínio.
+
+Enquanto minutos e segundos são naturalmente decompostos em pares de dígitos independentes $(d, u)$, com restrições locais bem definidas, o domínio das horas é compacto, dado por $H \in [0,23]$, o que implica um acoplamento global entre seus valores válidos.
+
+A decomposição completa das horas na forma
+\[
+H = (H_d, H_u)
+\]
+
+introduziria a necessidade de restrições adicionais de consistência, uma vez que nem toda combinação de dígitos decimais representa um estado válido no intervalo $[0,23]$ - veja $[24,29]$. Isso implicaria uma função de transição $\delta_H$ mais complexa, responsável não apenas pela evolução temporal, mas também pela validação de estados inválidos.
+
+Dessa forma, a escolha de representação mantém as horas como uma variável única, enquanto minutos e segundos são decompostos em dígitos independentes:
+\[
+Q = (H, (M_d, M_u), (S_d, S_u))
+\]

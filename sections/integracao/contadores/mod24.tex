@@ -1,0 +1,102 @@
+\subsection{Contador Síncrono MOD $24$}
+
+Seja $D$ o estado atual do contador, restrito ao conjunto de valores válidos.
+
+\paragraph{Incremento}
+A operação de incremento é definida por:
+\[
+D \mapsto (D + 1) \bmod 24
+\]
+
+A Tabela~\ref{tab:inc_mod24} apresenta a função de transição.
+
+\begin{table} [H] \label{tab:dec_mod24}
+\begin{center}
+\begin{tabular}{c|cc}
+    $D$ & $O$ & Carry \\
+    \hline
+    $00\,0000$ & $00\,0001$ & $0$ \\
+    $00\,0001$ & $00\,0010$ & $0$ \\
+    $\vdots$ &  &  \\
+    $00\,1001$ & $01\,0000$ & $0$ \\
+    $01\,0000$ & $01\,0001$ & $0$ \\
+    $\vdots$ &  &  \\
+    $01\,1001$ & $10\,0000$ & $0$ \\
+    $10\,0000$ & $10\,0001$ & $0$ \\
+    $\vdots$ &  &  \\
+    $10\,0010$ & $10\,0011$ & $0$ \\
+    $10\,0011$ & $00\,0000$ & $1$ \\
+\end{tabular}
+\end{center}
+\end{table}
+
+As expressões booleanas minimizadas são:
+
+\begin{align*}
+    o_{11} &= (D_{10} \land D_{03} \land D_{00}) \lor (D_{11} \land \lnot D_{01}) \lor (D_{11} \land \lnot D_{00}) \\[4pt]
+    o_{10} &= (\lnot D_{10} \land D_{03} \land D_{00}) \lor (D_{10} \land \lnot D_{03}) \lor (D_{10} \land \lnot D_{00}) \\[4pt]
+    o_{03} &= (D_{02} \land D_{01} \land D_{00}) \lor (D_{03} \land \lnot D_{00}) \\[4pt]
+    o_{02} &= (\lnot D_{11} \land \lnot D_{02} \land D_{01} \land D_{00}) \lor (D_{02} \land \lnot D_{01}) \lor (D_{02} \land \lnot D_{00}) \\[4pt]
+    o_{01} &= (\lnot D_{03} \land \lnot D_{01} \land D_{00}) \lor (D_{01} \land \lnot D_{00}) \\[4pt]
+    o_{00} &= \lnot D_{00} \\[4pt]
+    Carry &= D_{11} \land D_{01} \land D_{00}
+\end{align*}
+
+O sinal \textit{Carry} indica overflow.
+
+As Figuras~\ref{fig:incmod24} e~\ref{fig:incmod24-red} apresentam, respectivamente, a implementação lógica do circuito e sua realização em redstone.
+
+\imgbig{incmod24.png}{Circuito lógico para incremento em módulo 24.}
+\imgbig{incmod24-red.png}{Implementação em redstone do circuito de incremento em módulo 24.}
+
+\paragraph{Decremento}
+A operação de decremento é definida por:
+\[
+D \mapsto (D - 1) \bmod 24
+\]
+
+A Tabela~\ref{tab:dec_mod24} apresenta a função de transição.
+
+\begin{table} [H] \label{tab:dec_mod24}
+\begin{center}
+\begin{tabular}{c|cc}
+    $D$ & $O$ & Carry \\
+    \hline
+    $00\,0000$ & $10\,0011$ & $1$ \\
+    $00\,0001$ & $00\,0000$ & $0$ \\
+    $\vdots$ &  &  \\
+    $00\,1001$ & $00\,1000$ & $0$ \\
+    $01\,0000$ & $00\,1001$ & $0$ \\
+    $\vdots$ &  &  \\
+    $01\,1001$ & $01\,1000$ & $0$ \\
+    $10\,0000$ & $01\,1001$ & $0$ \\
+    $\vdots$ &  &  \\
+    $10\,0010$ & $10\,0001$ & $0$ \\
+    $10\,0011$ & $10\,0010$ & $0$ \\
+\end{tabular}
+\end{center}
+\end{table}
+
+As expressões booleanas minimizadas são:
+
+\begin{align*}
+    o_{11} &= (\lnot D_{11} \land \lnot D_{10} \land \lnot D_{03} \land \lnot D_{02} \land \lnot D_{01} \land \lnot D_{00}) \\
+    &\quad \lor (D_{11} \land D_{00}) \lor (D_{11} \land D_{01}) \\[4pt]
+    o_{10} &= (D_{10} \land D_{00}) \lor (D_{10} \land D_{01}) \lor (D_{10} \land D_{02}) \lor (D_{10} \land D_{03}) \\
+    &\quad \lor (D_{11} \land \lnot D_{01} \land \lnot D_{00}) \\[4pt]
+    o_{03} &= (D_{03} \land D_{00}) \lor (D_{10} \land \lnot D_{03} \land \lnot D_{02} \land \lnot D_{01} \land \lnot D_{00}) \\
+    &\quad \lor (D_{11} \land \lnot D_{01} \land \lnot D_{00}) \\[4pt]
+    o_{02} &= (D_{02} \land D_{00}) \lor (D_{02} \land D_{01}) \lor (D_{03} \land \lnot D_{00}) \\[4pt]
+    o_{01} &= (\lnot D_{11} \land \lnot D_{10} \land \lnot D_{01} \land \lnot D_{00}) \\
+    &\quad \lor (D_{01} \land D_{00}) \lor (D_{02} \land \lnot D_{01} \land \lnot D_{00}) \\
+    &\quad \lor (D_{03} \land \lnot D_{00}) \\[4pt]
+    o_{00} &= \lnot D_{00} \\[4pt]
+    Carry &= \lnot D_{11} \land \lnot D_{10} \land \lnot D_{03} \land \lnot D_{02} \land \lnot D_{01} \land \lnot D_{00}
+\end{align*}
+
+O sinal \textit{Carry} indica underflow.
+
+As Figuras~\ref{fig:decmod24} e~\ref{fig:decmod24-red} mostram a implementação lógica e sua versão em redstone.
+
+\imgbig{decmod24.png}{Circuito lógico para decremento em módulo 24.}
+\imgbig{decmod24-red.png}{Implementação em redstone do circuito de decremento em módulo 24.}

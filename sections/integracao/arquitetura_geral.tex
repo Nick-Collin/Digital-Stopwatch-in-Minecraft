@@ -1,126 +1,37 @@
 \subsection{Arquitetura Geral do Sistema}
 
 Neste projeto, o cronômetro é modelado como uma máquina de estados finita cíclica $(Q, \Sigma, q_0, \delta, F)$, cujo comportamento evolui de forma determinística ao longo do tempo.
-Tal que:
 
-\begin{itemize}
-    \item $Q = (H, M, S)$;
-    \item $\Sigma = \{0,1\}$: 0 para incremento, 1 para decremento;
-    \item $\delta : Q \times \Sigma \rightarrow Q$
+O estado do sistema é definido por:
 
-onde:
+\[
+Q = (H,M,S)
+\]
 
+e o alfabeto de controle:
+
+\[
+\Sigma = {0,1}
+\]
+
+onde 0 representa incremento e 1 representa decremento. A função de transição é definida como:
+
+\[
+<delta: Q \times \Sigma \rightarrow Q
+\]
+
+com $H$, $M$ e $S$ pertencentes aos intervalos:
 \begin{align*}
-H &\in [0, 23] \quad \text{representa as horas} \\
-M &\in [0, 59] \quad \text{representa os minutos} \\
-S &\in [0, 59] \quad \text{representa os segundos} \\
+H &\in [0, 23] \
+M &\in [0, 59] \
+S &\in [0, 59]
 \end{align*}
 
-O número total de estados possíveis do sistema é, portanto, finito e dado por:
-
+O espaço de estados é finito e dado por:
 \[
 |Q| = 24 \cdot 60 \cdot 60 \cdot 2 = 172800
 \]
 
-\subsubsection{Estrutura interna do estado}
-
-Existem duas principais formas de representar o estado interno do sistema, \textbf{representação binária direta} e \textbf{representação bcd}. 
-Ambas são representações do sistema, porém com diferentes compromissos entre eficiência de informação e simplicidade de implementação, respectivamente.
-Como demonstrado acima, existem $172800$ estados possíveis, o que requer um número mínimo $n$ de bits para representação, dado por:
-
-\begin{align*}
-n &= \left\lceil \log_2(24 \times 60 \times 60 \times 2) \right\rceil \\[4pt]
-&= \left\lceil \log_2(24) + \log_2(60) + \log_2(60) + \log_2(2) \right\rceil \\[4pt]
-&= \left\lceil (3 + \log_2 3) + 2(2 + \log_2 3 + \log_2 5) + 1 \right\rceil \\[4pt]
-&= \left\lceil 3 + \log_2 3 + 4 + 2\log_2 3 + 2\log_2 5 + 1 \right\rceil \\[4pt]
-&\approx \left\lceil 8 + 3(1.585) + 2(2.322) \right\rceil \\[4pt]
-&= \left\lceil 17.399 \right\rceil \\[4pt]
-&= 18
-\end{align*}
-
-Por outro lado, a representação BCD utiliza 4 bits para cada dígito decimal, totalizando 6 dígitos (2 para horas, 2 para minutos e 2 para segundos), resultando em $6 \cdot 4 = 24$ bits.
-Entretanto, note que, sob as restrições deste sistema, a representação BCD apresenta algumas vantagens em detrimento da representação binária direta.
-
-Primeiramente, além de ser mais intuitiva para a representação de valores decimais, a estrutura modular do BCD facilita a implementação de contadores independentes para cada dígito, simplificando a lógica de incremento e decremento. 
-
-Imagine, por exemplo, que fosse utilizada a representação binária direta, onde o estado $S$ é representado por um registrador de 18 bits. Para projetar uma função de transição LUT (), global, que realize o incremento ou decremento, seria necessário lidar com a complexidade de manipular um número binário de 18 bits, o que envolve
-tabelas verdade com $2^{18} = 262144$ entradas, tornando a implementação impraticável. 
-Por mais ue sistemas reais utilizem tecnicas combinacionais para reduzir a complexidade, a implementação em representação binária direta ainda ainda implicaria em uma função de transição de alta dimensionalidade, dificultando sua decomposição modular.
-
-Em contraste, com a representação BCD, cada dígito pode ser tratado como um contador independente, cada um com um número pequeno de bits.
-Além disso, dado os intervalos específicos de cada unidade de contagem (0-23 para horas, 0-59 para minutos e segundos), a representação BCD pode ser otimizada para reduzir a quantidade de bits necessários para armazenar o estado, eliminando a necessidade de bits adicionais para representar estados fora desses intervalos. Nesse contexto:
-
-\[
-H = (H_{d}, H_{u}), \quad M = (M_{d}, M_{u}), \quad S = (S_{d}, S_{u})
-\]
-
-com:
-
-\[
-H_{d} \in [0,2], \quad H_{u} \in [0,9], \quad M_{d}, S_{d} \in [0,5], \quad M_{u}, S_{u} \in [0,9]
-\]
-
-Assim, a representação BCD para o estado $Q$ pode ser organizada em um vetor de bits $D$ de tamanho $N = 21$, onde cada bit é alocado para representar os dígitos BCD correspondentes, conforme a seguinte estrutura: 
-
-\begin{center}
-\begin{tabular}{c|c}
-Bit & Função \\
-\hline
-0 & Controle de direção (0 para incremento, 1 para decremento)\\
-$(0,2]$ & $H_d$ \\
-$(2,6]$ & $H_u$ \\
-$(6,9]$ & $M_d$ \\
-$(9,13]$ & $M_u$  \\
-$(13,16]$ & $S_d$ \\
-$(16,20]$ & $S_u$ \\
-\end{tabular}
-\end{center}
-
-Dessa forma, a função de transição $\delta$ pode ser estruturada como um conjunto de subfunções independentes associadas a cada componente do estado, isto é, horas, minutos e segundos. Essa decomposição explora a estrutura hierárquica do sistema, reduzindo o acoplamento entre variáveis globais e permitindo que cada submódulo opere sobre um subconjunto restrito de bits.
-
-Como consequência, a complexidade da implementação não é dominada pela cardinalidade do espaço global de estados, mas sim pela complexidade local de cada unidade de atualização e pelas condições de propagação entre dígitos (carry/borrow). Isso viabiliza a construção de uma lógica combinacional modular, na qual cada bloco de transição pode ser projetado e otimizado de forma independente.
-
-\subsubsection{Função de transição}
-
-Como abordado na fundamentação acerca \nameref{sec:Máquina de Estados Finita}, a dinâmica do sistema é descrita por uma função de transição determinística $\delta$, que mapeia o estado atual do sistema para seu estado sucessor a cada evento de clock.
-
-Seja $Q_t = (H_t, M_t, S_t)$ o estado do sistema no instante $t$. A evolução temporal é definida por:
-
-\[
-Q_{t+1} = \delta(Q_t)
-\]
-
-No contexto deste projeto, a função de transição é induzida por uma operação de incremento ou decremento, definida pelo parâmetro $\sigma_t \in \Sigma$, unitário de tempo, podendo ser escrita como:
-
-\[
-\delta(H_t, M_t, S_t; \sigma_t) = (H_{t+1}, M_{t+1}, S_{t+1})
-\]
-
-A atualização do estado não ocorre de forma uniforme sobre todos os componentes, mas segue uma estrutura hierárquica com propagação condicional entre dígitos.
-
-Em particular, define-se a transição dos segundos como:
-
-\[
-(S_{t+1}, c_1) = \delta_S(S_t; \sigma_t)
-\]
-
-onde $c_1 \in \{0,1\}$ representa o carry de propagação para a unidade de minutos.
-
-Analogamente, a transição dos minutos é dada por:
-
-\[
-(M_{t+1}, c_2) = \delta_M(M_t, c_1; \sigma_t)
-\]
-
-e a transição das horas por:
-
-\[
-(H_{t+1}) = \delta_H(H_t, c_2; \sigma_t)
-\]
-
-Dessa forma, a função global $\delta$ pode ser expressa como a composição hierárquica:
-
-\[
-\delta = \delta_H \circ \delta_M \circ \delta_S
-\]
+\input{sections/integracao/arquitetura/estrutura_interna}
+\input{sections/integracao/arquitetura/func_trans}
 

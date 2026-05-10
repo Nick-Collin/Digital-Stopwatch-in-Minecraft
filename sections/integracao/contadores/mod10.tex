@@ -1,0 +1,91 @@
+\subsection{Contador Síncrono MOD $10$}
+
+Seja $D$ o estado atual do contador, restrito ao conjunto de valores válidos.
+
+\paragraph{Incremento}
+A operação de incremento é definida por:
+\[
+D \mapsto (D + 1) \bmod 10
+\]
+
+A Tabela~\ref{tab:inc_mod10} apresenta a função de transição.
+
+\begin{table} [H] \label{tab:dec_mod10}
+\begin{center}
+\begin{tabular}{c|cc}
+    $D$ & $O$ & Carry \\
+    \hline
+    $0000$ & $0001$ & $0$ \\
+    $0001$ & $0010$ & $0$ \\
+    $0010$ & $0011$ & $0$ \\
+    $0011$ & $0100$ & $0$ \\
+    $0100$ & $0101$ & $0$ \\
+    $0101$ & $0110$ & $0$ \\
+    $0110$ & $0111$ & $0$ \\
+    $0111$ & $1000$ & $0$ \\
+    $1000$ & $1001$ & $0$ \\
+    $1001$ & $0000$ & $1$ \\
+    $\vdots$ & $\vdots$ & $\vdots$ \\
+\end{tabular}
+\end{center}
+\end{table}
+
+As expressões booleanas minimizadas são:
+
+\begin{align*}
+    O_3 &= (\lnot D_3 \land D_2 \land D_1 \land D_0) \lor (D_3 \land \lnot D_2 \land \lnot D_1 \land \lnot D_0) \\[4pt]
+    O_2 &= (\lnot D_3 \land \lnot D_2 \land D_1 \land D_0) \lor (\lnot D_3 \land D_2 \land \lnot D_1) \lor (\lnot D_3 \land D_2 \land \lnot D_0) \\[4pt]
+    O_1 &= (\lnot D_3 \land \lnot D_1 \land D_0) \lor (\lnot D_3 \land D_1 \land \lnot D_0) \\[4pt]
+    O_0 &= (\lnot D_3 \land \lnot D_0) \lor (\lnot D_2 \land \lnot D_1 \land \lnot D_0) \\[4pt]
+    Carry &= D_3 \land \lnot D_2 \land \lnot D_1 \land D_0
+\end{align*}
+
+O sinal \textit{Carry} indica overflow.
+
+As Figuras~\ref{fig:incmod10.png} e~\ref{fig:incmod10-red.png} apresentam, respectivamente, a implementação lógica do circuito e sua realização em redstone.
+
+\imgbig{incmod10.png}{Circuito lógico para incremento em módulo 10.}
+\imgbig{incmod10-red.png}{Implementação em redstone do circuito de incremento em módulo 10.}
+
+\paragraph{Decremento}
+A operação de decremento é definida por:
+\[
+D \mapsto (D - 1) \bmod 10
+\]
+
+A Tabela~\ref{tab:dec_mod10} apresenta a função de transição.
+
+\begin{table} [H] \label{tab:dec_mod10}
+\begin{center}
+\begin{tabular}{c|cc}
+    $D$ & $O$ & Carry \\
+    \hline
+    $0000$ & $1001$ & $1$ \\
+    $0001$ & $0000$ & $0$ \\
+    $0010$ & $0001$ & $0$ \\
+    $0011$ & $0010$ & $0$ \\
+    $0100$ & $0011$ & $0$ \\
+    $0101$ & $0100$ & $0$ \\
+    $0110$ & $0101$ & $0$ \\
+    $0111$ & $0110$ & $0$ \\
+    $1000$ & $0111$ & $0$ \\
+    $1001$ & $1000$ & $0$ \\
+    $\vdots$ & $\vdots$ & $\vdots$ \\
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{align*}
+    O_3 &= (\lnot D_3 \land \lnot D_2 \land \lnot D_1 \land \lnot D_0) \lor (D_3 \land D_0) \\[4pt]
+    O_2 &= (D_2 \land D_0) \lor (D_2 \land D_1) \lor (D_3 \land \lnot D_0) \\[4pt]
+    O_1 &= (D_1 \land D_0) \lor (D_2 \land \lnot D_1 \land \lnot D_0) \lor (D_3 \land \lnot D_0) \\[4pt]
+    O_0 &= \lnot D_0 \\[4pt]
+    Carry &= \lnot D_3 \land \lnot D_2 \land \lnot D_1 \land \lnot D_0
+\end{align*}
+
+O sinal \textit{Carry} indica underflow.
+
+As Figuras~\ref{fig:decmod10.png} e~\ref{fig:decmod10-red.png} mostram a implementação lógica e sua versão em redstone.
+
+\imgbig{decmod10.png}{Circuito lógico para decremento em módulo 10.}
+\imgbig{decmod10-red.png}{Implementação em redstone do circuito de decremento em módulo 10.}

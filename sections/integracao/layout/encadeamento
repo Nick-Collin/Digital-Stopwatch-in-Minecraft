@@ -1,0 +1,15 @@
+\subsubsection{Encadeamento}
+
+A integração final do sistema consiste na interconexão dos módulos de contagem, registradores, multiplexadores e decodificadores de display, formando o pipeline síncrono hierárquico.
+
+Como descrito anteriormente, a arquitetura segue uma organização em cascata, na qual o sinal de clock global é compartilhado por todos os registradores, enquanto os sinais de carry/borrow atuam como elementos locais de propagação entre os contadores.
+
+O fluxo de atualização pode ser descrito como:
+
+\begin{itemize}
+\item O contador de segundos ($S$) recebe diretamente o clock global;
+\item O carry gerado por $S$ é propagado para o contador de minutos ($M$);
+\item O carry gerado por $M$ é propagado para o contador de horas ($H$);
+\end{itemize}
+
+Para que este encadeamento funcione adequadametne, os registradores precisam atualizar na descida do sinal de clock. Já que, como o carry atua na propagação do sinal de clock, e é ativo quando o contador atinge o estado final de seu cíclo, este sinal deve ser considerado como pulso somente quando o gerador retornar ao estado inicial.

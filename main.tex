@@ -1,24 +1,26 @@
 \documentclass[a4paper,12pt]{article}
 
-\usepackage[backend=biber]{biblatex}
-\addbibresource{bibliography.bib}
-
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[brazilian]{babel}
-\usepackage{amsmath}
+\usepackage{csquotes}
+
+\usepackage{amsmath, amsfonts}
 \usepackage{graphicx}
 \usepackage{geometry}
 \usepackage{float}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
 \usepackage{booktabs}
-\usepackage{amsfonts} 
 \usepackage{arydshln}
 \usepackage[protrusion=true, expansion=false]{microtype}
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
 \usepackage[colorlinks=true,
             linkcolor=black,
             citecolor=black,
             urlcolor=blue]{hyperref}
+
 \geometry{margin=2.5cm}
 
 % Melhorias de formatação
@@ -30,7 +32,7 @@
    	\centering
    	\includegraphics[width=\linewidth]{images/#1}
   	 \caption{#2}
-   	\label{fig:sincrono-time-diagram}
+   	\label{fig:#1}
 \end{figure}
 }
 
@@ -51,7 +53,7 @@
    	\centering
    	\includegraphics[width=0.7\linewidth]{images/#1}
   	 \caption{#2}
-   	\label{fig:sincrono-time-diagram}
+   	\label{fig:#1}
 \end{figure}
 }
 
@@ -60,7 +62,7 @@
    	\centering
    	\includegraphics[width=0.6\linewidth]{images/#1}
   	 \caption{#2}
-   	\label{fig:assincrono-time-diagram}
+   	\label{fig:as#1}
 \end{figure}
 }
 
@@ -69,7 +71,7 @@
    	\centering
    	\includegraphics[width=0.3\linewidth]{images/#1}
   	 \caption{#2}
-   	\label{fig:assincrono-circuit}
+   	\label{fig:#1}
 \end{figure}
 }
 
@@ -83,15 +85,24 @@ Da Lógica Fundamental no Logisim à Prototipagem em Redstone}
 \newpage
 \tableofcontents
 
-\include{chapters/01_introducao}
-\include{chapters/02_fundamentos}
-\include{chapters/03_minecraft}
-\include{chapters/04_interface}
-\include{chapters/05_clock}
-\include{chapters/06_memoria}
-\include{chapters/07_contadores}
-\include{chapters/08_integracao}
-\include{chapters/09_conclusao}
+\input{chapters/01_introducao}
+\newpage
+\input{chapters/02_fundamentos}
+\newpage
+\input{chapters/03_minecraft}
+\newpage
+\input{chapters/04_interface}
+\newpage
+\input{chapters/05_clock}
+\newpage
+\input{chapters/06_memoria}
+\newpage
+\input{chapters/07_contadores}
+\newpage
+\input{chapters/08_integracao}
+\newpage
+\input{chapters/09_conclusao}
+\newpage
 
 \section{Referencias}
 

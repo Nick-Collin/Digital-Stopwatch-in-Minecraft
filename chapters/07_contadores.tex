@@ -1,12 +1,41 @@
 \section{Contadores}
 
-Contadores são dispositivos digitais que mantêm um registro de quantas vezes um evento ocorreu. Eles podem ser classificados em contadores \textbf{síncronos} e \textbf{assíncronos}, dependendo de como os sinais de clock são aplicados.
+\subsection{Definição e Modelo de Estado}
+
+Contadores são dispositivos digitais que mantêm um registro do número de ocorrências de um evento ao longo do tempo.
+
+Formalmente, um contador pode ser descrito como um sistema sequencial cujo estado $Q \in \{0,1\}^n$ representa o valor atual armazenado, e cuja evolução é definida por uma função de transição de estado:
+
+\[
+Q(t+1) = \delta(Q(t))
+\]
+
+Na prática, essa estrutura é implementada como a composição de:
+\begin{itemize}
+    \item um \textbf{registrador}, responsável pelo armazenamento do estado;
+    \item uma \textbf{função de transição}, implementada por lógica combinacional.
+\end{itemize}
+
+Essa interpretação permite modelar contadores como casos particulares de FSMs, conforme apresentado na seção \ref(fsm).
+
+No contexto de contadores, os elementos de uma FSM assumem uma estrutura específica:
+\begin{itemize}
+    \item o conjunto de estados corresponde aos valores binários representáveis pelo registrador;
+    \item a função de transição $\delta$ implementa diretamente a lógica de contagem;
+    \item o estado inicial define o valor inicial do contador;
+    \item a função de saída coincide com o próprio estado armazenado;
+    \item o alfabeto de entrada pode ser trivial ou incluir sinais de controle, como incremento, decremento ou reset.
+\end{itemize}
+
+Em particular, para um contador módulo $N$, a função de transição pode ser expressa como:
+
+\[
+\delta(q) = (q + 1) \mod N
+\]
+
+A operação módulo $N$, denotada por $\mod N$, corresponde ao resto da divisão inteira por $N$. 
+No contexto de contadores, isso implica que, ao atingir o valor máximo $N-1$, o próximo estado retorna a $0$.
 
 \input{sections/contadores/categorizacao}
-\input{sections/contadores/arquiteturas_assincronas}
-\input{sections/contadores/arquiteturas_sincronas}
-\input{sections/contadores/adder_based}
-\input{sections/contadores/ring_jhonson}
-\input{sections/contadores/mod6}
-\input{sections/contadores/mod10}
-\input{sections/contadores/mod24}
+\input{sections/contadores/arquiteturas}
+

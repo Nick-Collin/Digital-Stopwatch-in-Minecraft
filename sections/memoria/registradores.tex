@@ -1,20 +1,20 @@
 \subsection{Registradores}
 
-Registradores são estruturas de memória compostas por múltiplos flip-flops.
+Registradores são estruturas de memória síncrona compostas por múltiplos flip-flops, utilizadas para armazenar estados binários de forma simultânea.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/D-Reg-4bit.png}
-    \caption{Registrador de 4 bits Utilizando flip flops tipo D}
+    \caption{Registrador de 4 bits utilizando flip-flops tipo D}
     \label{fig:D-Reg-4bit}
 \end{figure}
 
-Um registrador de $n$ bits armazena um estado $Q$ em um vetor:
+Um registrador de $n$ bits armazena um estado $Q \in \{0,1\}^n$, representado por:
 
 \[
-Q = (Q_0, Q_1, ..., Q_{n-1})
+Q = (Q_0, Q_1, \dots, Q_{n-1})
 \]
 
-De tal forma que todos os bits $Q_i \forall i \in [0, n-1]$ são atualizados simultaneamente no pulso de clock.
+Em arquiteturas síncronas, todos os bits $Q_i$, com $i \in [0, n-1]$, são atualizados simultaneamente em resposta a uma borda do sinal de clock, garantindo coerência temporal do estado armazenado.
 
-Esse será um componente fundamental para este projeto, visto que o estado do cronômetro, será armazenado em registradores a base de flip flops tipo D.
+No contexto deste projeto, os registradores são implementados com flip-flops do tipo D e constituem o mecanismo fundamental de armazenamento do estado do cronômetro.
