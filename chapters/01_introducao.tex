@@ -1,12 +1,13 @@
 \section{Introdução}
 
-Este trabalho apresenta o desenvolvimento de um cronômetro digital completo no formato HH:MM:SS, operando com lógica de contagem crescente e decrescente. O projeto fundamenta-se na utilização exclusiva de lógica digital básica no ambiente Logisim Evolution, respeitando a restrição rigorosa de não utilizar circuitos integrados prontos.
+O projeto de sistemas digitais sequenciais constitui uma etapa fundamental no estudo de arquitetura de computadores e lógica digital, pois permite a consolidação de conceitos como armazenamento de estado, sincronização temporal e construção de máquinas de estados finitas.
 
-Esta abordagem visa consolidar o entendimento profundo de blocos fundamentais, como portas lógicas, somadores de 4 bits e unidades de armazenamento de estado. A arquitetura do sistema é estritamente modular, seguindo um fluxo de processamento que parte da geração de um sinal de clock periódico, passa por uma unidade de controle e resulta na atualização de contadores encadeados (MOD 6, MOD 10 e MOD 24).
+Neste contexto, este trabalho propõe o desenvolvimento de um cronômetro digital síncrono no formato HH:MM:SS, com suporte a contagem crescente e decrescente. O sistema é projetado exclusivamente a partir de blocos lógicos fundamentais, incluindo portas lógicas, circuitos combinacionais e registradores, sem o uso de componentes integrados de alto nível, visando consolidar, de forma prática, conhecimentos acerca dos fundamentos de arquitetura e organização de computadores.
 
-Para a interface com o usuário, implementou-se um sistema de exibição composto por decodificadores BCD para 7 segmentos, garantindo a conversão correta dos valores binários em sinais visuais.
+A arquitetura adotada foi estruturada em torno da definição de uma máquina de estados finita responsável pela evolução temporal do sistema a partir de contadores organizados de forma hierárquica.
 
-Como diferencial metodológico, o projeto utiliza o Minecraft Java Edition como plataforma de prototipagem. Através das propriedades da redstone, que permite a abstração de sistemas binários (estados 0 e 1), foi possível validar o uso deste jogo como método pedagógico acerca dos conceitos de lógica sequencial e combinacional, em um ambiente tridimensional e abstrato das limitações físicas.
+Como etapa adicional de validação e prototipagem conceitual, o projeto explora o ambiente do Minecraft Java Edition como plataforma de simulação de circuitos digitais voltada ao desenvolvimento pedagógico. Por meio da redstone, que abstrai comportamentos binários fundamentais, torna-se possível representar e testar conceitos de lógica sequencial e combinacional em um ambiente tridimensional interativo.
 
-Para viabilizar circuitos complexos e mitigar limitações de propagação e atraso inerentes ao jogo, foram aplicados modificadores que implementam conceitos de \textit{Wired Redstone} e barramentos de sinal instantâneos, permitindo uma transição fluida entre teoria digital e implementação prática.
+Além disso, a discretização natural do tempo no jogo, em \textit{Game Ticks} e \textit{Redstone Ticks}, permite uma análise intuitiva e abstrata de complexidades físicas dos paradigmas de sincronização e temporizazção dos sinais. 
 
+Dessa forma, o trabalho estabelece uma ponte entre a formalização matemática de sistemas sequenciais e sua realização física e simulada, integrando ferramentas educacionais e computacionais para o estudo de sistemas digitais.

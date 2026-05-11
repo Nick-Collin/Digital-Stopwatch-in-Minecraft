@@ -1,11 +1,13 @@
 \section{Conclusão}
 
-O desenvolvimento deste projeto permitiu a consolidação de conceitos essenciais da eletrônica digital, desde a simplificação de funções booleanas via Mapas de Karnaugh até a implementação de máquinas de estados finitos.
+O desenvolvimento deste projeto permitiu a consolidação prática de conceitos fundamentais de sistemas digitais sequenciais, por meio de tentativa e erro, incluindo a construção de circuitos combinacionais, a síntese de funções booleanas com uso de Mapas de Karnaugh e a compreensão de Máquinas de Estados Finitas.
 
-A restrição ao uso de componentes básicos forçou a compreensão da lógica interna de cada subcircuito, como o uso de multiplexadores para alternar entre incremento e decremento e o encadeamento de sinais de \textit{carry} e \textit{borrow} para a contagem em cascata.
+A abordagem estritamente baseada em componentes básicos exigiu a decomposição explícita da lógica interna do sistema e compreensão de alguns conceitos físicos que permeiam esta área do conhecimento. Outrossim, evidenciou o papel de elementos como multiplexadores na seleção entre modos operacionais de incremento e decremento, bem como a diferenciação de propagações síncronas e assíncronas.
 
-A prototipagem no Minecraft demonstrou-se uma ferramenta pedagógica poderosa, revelando desafios reais de propagação de sinais e sincronização, frequentemente omitidos em simuladores puramente teóricos.
+A modelagem do sistema como uma arquitetura modular baseada em FSMs encadeadas permitiu uma separação clara entre os níveis de controle e armazenamento de estado, reforçando a importância da organização hierárquica em sistemas sequenciais complexos.
 
-O uso de flip-flops tipo D para memória e registradores confirmou a viabilidade de construir sistemas sequenciais complexos a partir de elementos discretos.
+Como etapa complementar, a prototipagem no ambiente Minecraft Java Edition mostrou-se útil para a validação conceitual do sistema, permitindo observar na prática limitações relacionadas à propagação de sinais, sincronização e atrasos lógicos, frequentemente abstraídos em ferramentas de simulação tradicionais.
 
-Em suma, o trabalho evidencia que a arquitetura modular e a análise rigorosa das transições de estado são fundamentais para o sucesso de sistemas digitais, independentemente do meio físico de implementação.
+A utilização de flip-flops do tipo D como elemento básico de armazenamento confirmou a viabilidade da construção de sistemas temporais determinísticos a partir de unidades discretas de memória sincronizadas por clock global.
+
+Por fim, o trabalho demonstra que a construção de sistemas digitais complexos depende não apenas da correta definição de blocos lógicos individuais, mas principalmente da coerência na integração entre camadas de abstração, onde a estrutura de estados e a dinâmica de transição desempenham papel central no comportamento global do sistema.

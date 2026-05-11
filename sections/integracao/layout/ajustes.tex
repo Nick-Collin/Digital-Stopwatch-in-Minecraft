@@ -1,3 +1,9 @@
 \subsection{Ajustes Finais}
 
-Finalmente, conecta-se um sinal bloqueando 
+Finalmente, faz-se necessária uma forma de \textit{resetar} o estado do sistema de volta para $q_0$, neste caso $(0,(0,0):(0,0))$. 
+Assim, foi adicionada uma entrada $R \in {0,1}$, independente do clock global, isto é, assíncrona, tal que $R = 1 \Rightarrow Q = q_0$. 
+
+Além disso, conectou-se todas as entradas de seleção dos multiplexadores em uma única entrada $\sigma$ e impementou-se o clock global, conectado diretamente ao clock com detector de borda descendente no registrador da unidade de segundo $S_u$.
+
+
+

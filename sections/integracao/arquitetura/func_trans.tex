@@ -1,6 +1,6 @@
 \subsubsection{Função de transição}
 
-Como abordado na seção \ref{fsm}, a dinâmica do sistema é descrita por uma função de transição determinística $\delta$, que mapeia o estado atual do sistema para seu estado sucessor a cada evento de clock.
+Como abordado na seção \ref{fsm}, a dinâmica do sistema é descrita por uma função de transição $\delta$, a qual mapeia o estado atual do sistema para seu estado sucessor a cada evento de clock.
 
 Seja $Q_t = (H_t, M_t, S_t)$ o estado do sistema no instante $t$. A evolução temporal é definida por:
 
@@ -34,9 +34,9 @@ onde $c_S$ e $c_M$ representam os sinais de carry/borrow gerados pelos contadore
 Alternativamente: 
 
 \begin{align*}
-    \delta_s(S_t; \sigma) \rightarrow (S_{t+1}, c_S)\\
-    \delta_m(M_t; \sigma) \xrightarrow{c_S} (M_{t+1}, c_M) \\
-    \delta_h(H_t; \sigma) \xrightarrow{c_S \land s_M} (H_{t+1})
+    \delta_S(S_t; \sigma) \rightarrow (S_{t+1}, c_S)\\
+    \delta_M(M_t; \sigma) \xrightarrow{c_S} (M_{t+1}, c_M) \\
+    \delta_H(H_t; \sigma) \xrightarrow{c_S \land s_M} (H_{t+1})
 \end{align*}
 
 A função global $\delta$ é, portanto, implementada por meio da composição das funções $\delta_S$, $\delta_M$ e $\delta_H$, com propagação de sinais de carry/borrow entre os módulos.
@@ -48,7 +48,7 @@ A função global $\delta$ é, portanto, implementada por meio da composição d
 De forma análoga, cada contador é decomposto em unidades e dezenas, seguindo a mesma lógica hierárquica de habilitação interna:
 
 \begin{align*}
-(X_{u,t+1}, c_{int}) &= \delta_X^{(u)}(X_{u,t}, c_{in}, e_X) \\
+(X_{u,t+1}, c_{int}) &= \delta_X^{(u)}(X_{u,t}, e_X) \\
 (X_{d,t+1}, c_X) &= \delta_X^{(d)}(X_{d,t}, c_{int}, e_X)
 \end{align*}
 
@@ -56,12 +56,9 @@ onde:
 \begin{itemize}
     \item $X_u$ representa a unidade do dígito;
     \item $X_d$ representa a dezena;
-    \item $c_{in}$ é o carry/borrow de entrada;
     \item $c_{int}$ é o carry/borrow interno;
     \item $e_X$ é o sinal de habilitação do módulo.
     \item $c_X$ é dado por $(c_{int} \land e_X)$
 \end{itemize}
 
 Dessa forma, cada transição de estado pode ser implementada como um contador modular independente, cuja lógica de transição depende apenas de um subconjunto restrito de variáveis e de sinais de propagação provenientes do nível imediatamente inferior.
-
-Essa abordagem permite reduzir a complexidade da função de transição global, substituindo uma única função de alta dimensionalidade por um conjunto de funções locais de menor complexidade, interligadas por sinais de controle simples.

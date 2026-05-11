@@ -6,7 +6,7 @@ Essa estrutura faz com que as transições de estado ocorram de forma sequencial
 
 \begin{figure}[H]
    	\centering
-   	\includegraphics[width=0.7\linewidth]{images/assincrono-time-diagram.png}
+   	\includegraphics[width=0.6\linewidth]{images/assincrono-time-diagram.png}
   	 \caption{Diagrama de tempo de um contador assíncrono}
    	\label{fig:assincrono-time-diagram}
 \end{figure}
@@ -14,3 +14,12 @@ Essa estrutura faz com que as transições de estado ocorram de forma sequencial
 Como consequência, durante as transições, o sistema pode assumir estados intermediários inválidos por curtos intervalos de tempo, o que compromete a previsibilidade temporal do circuito.
 
 Apesar disso, contadores assíncronos apresentam baixa complexidade estrutural, uma vez que não requerem lógica combinacional adicional para controle de transição. Por essa razão, são frequentemente utilizados em aplicações simples, onde custo e facilidade de implementação são mais relevantes do que precisão temporal.
+
+Tipicamente, esses contadores são implementados com flip-flops JK conectados em cascata, conforme ilustrado a seguir:
+
+\begin{figure}[H]
+   	\centering
+   	\includegraphics[width=0.14\linewidth]{images/assincrono-circuit.png}
+  	 \caption{Circuito de um contador assíncrono}
+   	\label{fig:assincrono-circuit}
+\end{figure}

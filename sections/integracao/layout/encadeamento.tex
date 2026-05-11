@@ -1,0 +1,24 @@
+\subsubsection{Encadeamento}
+
+Como descrito anteriormente, a arquitetura segue uma organização em cascata, na qual o sinal de clock global é aplicado a todos os níveis do sistema, sob o controle dos sinais de carry/borrow que atuam habilitando ou desabilitanto a propagação da contagem.
+
+O fluxo de atualização pode ser descrito, então, como:
+
+\begin{align*}
+clk \rightarrow \delta_S(S_t;\sigma_t) \xrightarrow{e_M}  \delta_M(M_t;\sigma) \xrightarrow{e_H} \delta_H(\delta_t(H_t;\sigma))
+\end{align*}
+
+onde:
+
+\begin{align*}
+e_M = c_S = c_S^{(u)} \land c_S^{(d)} \\
+e_H = e_M \land c_M \land c_M^{(u)} \land c_M^{(d)}
+\end{align*}
+
+Assim, convencionou-se que todos os registradores atualizariam na borda de descida
+
+\imgbig{falling-pulse-red.png}{Detector de borda de descida aplicado ao enable do registrador de redstone}
+
+e encadeou-se todos os contadores seguindo a lógica descrita.
+
+\imgbig{encadeamento.jpg}{Encadeamento dos contadores no Logisim}
