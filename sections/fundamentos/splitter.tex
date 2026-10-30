@@ -1,2 +1,21 @@
 \subsection{Splitters}
 \label{sec:splitter}
+
+Em circuitos digitais, um \textit{splitter} é um bloco combinacional usado para dividir um sinal de entrada em múltiplas vias independentes, mantendo o mesmo valor lógico em cada saída. Em termos práticos, ele atua como uma réplica do sinal, permitindo que a mesma informação seja distribuída para diferentes partes do sistema sem que uma carga influencie diretamente as outras.
+
+Essa ideia é especialmente relevante em projetos sequenciais, nos quais o mesmo bit de clock ou de controle precisa ser observado por diversos registradores, contadores e portas lógicas. Sem esse mecanismo, um único nó de sinal acabaria sendo compartilhado de forma indiscriminada, afetando a integridade da propagação e tornando o circuito mais sensível a ruído e variações de carga.
+
+No contexto de eletrônica digital, o conceito é semelhante ao de uma bifurcação de sinal: uma entrada entra em um ponto de rede e sai em vários ramos, cada um mantendo o mesmo nível lógico. Em implementações em hardware discreto, essa operação pode ser realizada com fios, buffers ou circuitos de amplificação, dependendo da tecnologia e da resistência de carga do restante do circuito.
+
+No projeto do cronômetro, a utilização de \textit{splitters} é importante para distribuir o clock global e os sinais de controle para vários módulos sem que o atraso ou a carga de um ramo comprometa os demais. Em outras palavras, o splitter garante que a informação elétrica seja reproduzida de forma fiel e simultânea em diferentes estágios do sistema.
+
+A figura abaixo representa essa ideia de forma conceitual: um único sinal entra no bloco e emerge em múltiplas cópias com o mesmo valor lógico.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/redstone.png}
+    \caption{Distribuição de um sinal por meio de um splitter conceitual}
+    \label{fig:splitter-conceitual}
+\end{figure}
+
+Em sistemas síncronos, essa funcionalidade é essencial para manter o relógio e as entradas de dados alinhados, evitando que diferentes blocos recebam versões ligeiramente diferentes do mesmo sinal devido a atrasos de propagação ou a acoplamentos elétricos.

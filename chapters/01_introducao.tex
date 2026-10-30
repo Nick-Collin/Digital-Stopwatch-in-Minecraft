@@ -8,6 +8,16 @@ A arquitetura adotada foi estruturada em torno da definição de uma máquina de
 
 Como etapa adicional de validação e prototipagem conceitual, o projeto explora o ambiente do Minecraft Java Edition como plataforma de simulação de circuitos digitais voltada ao desenvolvimento pedagógico. Por meio da redstone, que abstrai comportamentos binários fundamentais, torna-se possível representar e testar conceitos de lógica sequencial e combinacional em um ambiente tridimensional interativo.
 
-Além disso, a discretização natural do tempo no jogo, em \textit{Game Ticks} e \textit{Redstone Ticks}, permite uma análise intuitiva e abstrata de complexidades físicas dos paradigmas de sincronização e temporizazção dos sinais. 
+Além disso, a discretização natural do tempo no jogo, em \textit{Game Ticks} e \textit{Redstone Ticks}, permite uma análise intuitiva e abstrata de complexidades físicas dos paradigmas de sincronização e temporização dos sinais.
+
+A estrutura do cronômetro pode ser vista como um sistema sequencial cujo estado em um instante $t$ é dado por $(H_t, M_t, S_t, D_t)$, com $H_t$, $M_t$ e $S_t$ representando horas, minutos e segundos, respectivamente. Nesse modelo, cada transição de estado ocorre em resposta a um pulso do clock global, preservando o sincronismo entre os blocos do sistema.
+
+\begin{equation}
+    \text{Estado}(t) = (H_t, M_t, S_t, D_t)
+\end{equation}
+
+Nesse modelo, cada componente representa um dígito da contagem temporal e a atualização do estado ocorre de forma discreta e síncrona.
 
 Dessa forma, o trabalho estabelece uma ponte entre a formalização matemática de sistemas sequenciais e sua realização física e simulada, integrando ferramentas educacionais e computacionais para o estudo de sistemas digitais.
+
+\label{sec:cronometro}

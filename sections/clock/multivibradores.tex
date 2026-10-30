@@ -1,0 +1,19 @@
+\subsection{Multivibradores}
+
+Os multivibradores são circuitos osciladores que alternam estados lógicos entre dois níveis com periodicidade definida por elementos de armazenamento e temporização. Eles são fundamentais para a geração de sinais de clock e para a produção de pulsos controlados em sistemas digitais.
+
+Existem três categorias principais:
+
+\begin{itemize}
+    \item \textbf{Monostável:} possui um único estado estável e produz um pulso quando disparado;
+    \item \textbf{Astável:} não possui estado estável, alternando continuamente entre os níveis com frequência definida;
+    \item \textbf{Biestável:} mantém um de dois estados estáveis e muda de estado somente quando recebe um disparo externo.
+\end{itemize}
+
+No contexto deste trabalho, o elemento mais importante é o multivibrador astável, pois ele gera o sinal periódico que serve de referência temporal ao sistema. Em circuitos eletrônicos, isso normalmente é realizado com osciladores baseados em cristal, amplificadores e feedback. Em redstone, a geração de clock pode ser modelada por um circuito de repetidores e atrasos discretos, que reproduzem em escala a mesma ideia de alternância entre estados.
+
+A forma mais simples de se pensar em um astável é como um circuito que, ao ser ativado, alterna continuamente entre 0 e 1, produzindo um ciclo de tempo $T$. Essa alternância é precisamente a base do clock digital, permitindo que cada bloco do sistema atualize o estado em instantes bem definidos.
+
+Em projetos de cronômetros digitais, os multivibradores também aparecem em variações monostáveis quando se deseja gerar um pulso curto para acionar um registrador ou liberar a visualização do display por um intervalo temporizado. Nesses casos, o circuito responde a um evento externo, produz um pulso de duração controlada e retorna ao estado inicial sem sustentar a oscilação.
+
+Assim, a função do multivibrador é direta: transformar energia ou sinais de entrada em uma sequência temporal artificial que organiza as transições internas do circuito e garante sincronismo entre os módulos do sistema.

@@ -68,3 +68,17 @@ $(\lnot(p \land q) \equiv (\lnot p \lor \lnot q)) \iff ((p \land q) \equiv \lnot
 
 \subsubsection{Xor}
 
+A porta XOR também pode ser implementada em redstone de forma direta, explorando a natureza do circuito de alimentação por dois caminhos alternativos. Seu comportamento é simples: a saída fica ativa somente quando os sinais de entrada são diferentes.
+
+Em Minecraft, uma implementação comum usa dois fios de entrada que entram em uma estrutura de rede de maneira complementar, de modo que somente a combinação de estados distintos produz energia na saída. Se ambos os sinais forem iguais, a rede se anula e o resultado permanece em nível baixo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/xor-redstone.png}
+    \caption{Porta XOR em redstone}
+    \label{fig:xor-redstone}
+\end{figure}
+
+Essa porta é especialmente importante em circuitos aritméticos, pois permite detectar diferenças entre sinais. No cronômetro, ela aparece em operações de comparação, controle de mudança entre estados e geração de sinais de condição em trechos de lógica combinacional.
+
+Assim como nas portas lógicas clássicas, a XOR em redstone funciona como um detector de desigualdade: atua como uma confirmação de que a entrada mudou de um estado para o outro, e não como uma simples cópia de um dos sinais.
