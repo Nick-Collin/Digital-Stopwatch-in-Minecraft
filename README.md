@@ -131,46 +131,6 @@ The objective is to establish a conceptual connection between simulated digital 
 
 The theoretical documentation and circuit design are nearing completion. Some sections are still undergoing revision, and the implementation and documentation are being progressively consolidated.
 
-| Area | Status |
-|---|---|
-| Binary and BCD fundamentals | Documented |
-| Transistor fundamentals | Under revision |
-| Boolean algebra and logic gates | Documented |
-| Sequential logic and memory | Documented |
-| Clock and synchronization | Under revision |
-| Modular counter architecture | Developed |
-| Timer integration | Under refinement |
-| User interface and displays | Under refinement |
-| Redstone prototyping | In development |
-| Final validation and documentation | Pending |
-
-## Repository Structure
-
-The repository is intended to contain the technical documentation, circuit designs, and implementation resources associated with the project.
-
-```text
-digital-timer/
-├── README.md
-├── docs/
-│   └── digital-timer.pdf
-├── logisim/
-│   └── circuits/
-├── minecraft/
-│   └── redstone/
-└── images/
-```
-
-*The structure above represents the intended organization and may evolve as development progresses.*
-
-## Motivation
-
-This project started as an attempt to understand how digital systems work beyond their high-level abstractions.
-
-Rather than treating a processor or digital circuit as a black box, the goal is to progressively understand how its behavior emerges from fundamental electronic and logical components.
-
-Building a timer provides a relatively contained environment in which to explore these concepts, connecting mathematical models, Boolean logic, memory, synchronization, and system architecture.
-
-Ultimately, this project is an exercise in understanding digital computation from first principles.
 
 ---
 
@@ -179,5 +139,3 @@ Ultimately, this project is an exercise in understanding digital computation fro
 **Documentation:** Portuguese
 
 **Date:** May 3, 2026
-
-**License:** To be determined.
