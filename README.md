@@ -131,6 +131,8 @@ The objective is to establish a conceptual connection between simulated digital 
 
 The theoretical documentation and circuit design are nearing completion. Some sections are still undergoing revision, and the implementation and documentation are being progressively consolidated.
 
+Some Images are still placeholders or not included.
+
 
 ---
 
