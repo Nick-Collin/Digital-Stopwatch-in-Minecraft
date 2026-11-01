@@ -1,6 +1,8 @@
 # Digital Timer — HH:MM:SS
 ### Design and Implementation: From Fundamental Logic in Logisim to Redstone Prototyping
 
+[![](https://markdown-videos-api.jorgenkh.no/youtube/{v4O1UXrDRkE?si=nhgMlzbwbZp17sIT})](https://youtu.be/{v4O1UXrDRkE?si=nhgMlzbwbZp17sIT})
+
 An educational project exploring the design and implementation of a synchronous, bidirectional digital timer using fundamental digital logic concepts, Logisim Evolution, and Minecraft Redstone.
 
 ## Overview
