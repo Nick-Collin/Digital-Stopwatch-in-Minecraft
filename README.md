@@ -1,7 +1,10 @@
 # Digital Timer — HH:MM:SS
 ### Design and Implementation: From Fundamental Logic in Logisim to Redstone Prototyping
 
-[![](https://markdown-videos-api.jorgenkh.no/youtube/{v4O1UXrDRkE?si=nhgMlzbwbZp17sIT})](https://youtu.be/{v4O1UXrDRkE?si=nhgMlzbwbZp17sIT})
+## Project Resources
+
+- **[Technical Documentation (Google Drive)](https://drive.google.com/file/d/1z4OOKDQfl4mb76b93_TmXXYPPDICPuzp/view?usp=sharing)** — Complete theoretical foundations and project documentation.
+- **[YouTube Video Preview](https://youtu.be/v4O1UXrDRkE)** — Preview of the project and its implementation.
 
 An educational project exploring the design and implementation of a synchronous, bidirectional digital timer using fundamental digital logic concepts, Logisim Evolution, and Minecraft Redstone.
 
